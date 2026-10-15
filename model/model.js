@@ -1,36 +1,40 @@
-// const model = {
-//     app: {
-//         currentPage: '',
-//     },
-//     viewState: {
-//         page1: {
-
-//         },
-//         page2: {
-
-//         },
-//         page3: {
-
-//         },
-//         page4: {
-
-//         },
-//     },
-//     trips: [],
-//     notes: [],
-//     stats: [],
-// }
-
 const model = {
     app: {
-        currentPage: "home",
-        textSize: "standard",
+        currentPage: "login",
     },
 
     viewState: {
-        // Hjem
-        homePage: {
-            filter: "recent",
+        // Login
+        loginPage: {
+            userInput: "",
+            passwordInput: "",
+        },
+        // Ny tur
+        newTripPage: {
+            tripId: null,
+            activityId: null,
+            title: "",
+            location: "",
+            date: null,
+            countyId: null,
+            pictures: [],
+            description: "",
+            // audioInput: null
+        },
+
+        editTripPage: {
+            tripId: null,
+            title: "",
+            date: null,
+            description: "",
+            pictures: [],
+            topics: [],
+        },
+
+        // Turliste
+        tripViewPage: {
+            tripId: null,
+            pageNumber: null, // paging
         },
 
         // Nytt notat
@@ -56,37 +60,13 @@ const model = {
             noteId: null,
         },
 
-        // Turdetaljer
-        tripViewPage: {
-            tripId: null,
-        },
-
-        // Ny tur
-        newTripPage: {
-            tripId: null,
-            activityId: null,
-            title: "",
-            location: "",
-            date: null,
-            countyId: null,
-            pictures: [],
-            description: "",
-            // audioInput: null
-        },
-
-        editTripPage: {
-            tripId: null,
-            title: "",
-            date: null,
-            description: "",
-            pictures: [],
-            topics: [],
-        },
-
         // Søk
+        // Bør vi ha alle filterne i ett array her?
         searchPage: {
             searchStr: null,
-            activeFilters: [],
+            selectedActivity: "",
+            selectedTopic: "",
+            season: "",
             searchHits: [],
         },
 
@@ -129,7 +109,6 @@ const model = {
         trips: [
             {
                 id: 1,
-                //status: 'planned',
                 activityId: 4,
                 title: "Fisketur til Hammervatnet",
                 location: "Hammervatnet",
@@ -137,6 +116,7 @@ const model = {
                 countyId: 4,
                 pictures: [1, 2, 3],
                 description: "",
+                updatedAt: "2026-10-06T19:24",
             },
         ],
 
@@ -156,21 +136,8 @@ const model = {
                 description:
                     "Bør prioritere turer i september–oktober før snøen legger seg i høyden.",
                 topics: [1, 2, 6],
-                //updatedAt: '2026-10-06T19:24',
+                updatedAt: "2026-10-06T19:24",
             },
         ],
-
-        // Statistikk ???
-        // stats: [],
     },
 };
-
-// Hjem             +
-// Ny tur           +
-// Turdetaljer      +
-// Endre tur        +
-// Nytt notat       +
-// Notater          +
-// Endre notat      +
-// Søk              +
-// Innstillinger    +
