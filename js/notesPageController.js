@@ -21,8 +21,5 @@ function addNewNote() {
     notes.push(newNote);
 }
 
-// addNewNote();
-
-
 // skal dato i common.js?
 // skal id i common.js?
