@@ -1,6 +1,6 @@
 function addNewNote() {
     const noteForm = model.viewState.newNotePage;
-    const newNote = structuredClone(noteForm); // ???
+    const newNote = structuredClone(noteForm);
     const notes = model.data.notes;
 
     let newId = 0;
@@ -20,6 +20,3 @@ function addNewNote() {
 
     notes.push(newNote);
 }
-
-// skal dato i common.js?
-// skal id i common.js?

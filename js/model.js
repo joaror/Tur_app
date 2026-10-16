@@ -1,5 +1,7 @@
 const model = {
   app: {
+    // currentPage: "notesPage",
+    // currentPage: "tripsPage",
     currentPage: "loginPage",
   },
 
@@ -17,7 +19,7 @@ const model = {
       activityId: null,
       title: "",
       location: "",
-      date: null,
+      date: "",
       countyId: null,
       description: "",
       pictures: [],
@@ -28,7 +30,7 @@ const model = {
       activityId: null,
       title: "",
       location: "",
-      date: null,
+      date: "",
       countyId: null,
       description: "",
       pictures: [],
@@ -43,7 +45,7 @@ const model = {
     // Nytt notat
     newNotePage: {
       title: "",
-      date: null,
+      date: "",
       description: "",
       topics: [],
     },
@@ -51,7 +53,7 @@ const model = {
     editNotePage: {
       noteId: null,
       title: "",
-      date: null,
+      date: "",
       description: "",
       topics: [],
     },
@@ -154,7 +156,7 @@ const model = {
         date: "2026-10-05",
         description:
           "Bør prioritere turer i september–oktober før snøen legger seg i høyden.",
-        topics: [1, 2, 6],
+        topics: [1, 2, 5],
         updatedAt: "2026-10-06T19:24",
       },
     ],
