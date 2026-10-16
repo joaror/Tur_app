@@ -217,6 +217,12 @@ body {
   margin: 0 0 12px;
 }
 
+.empty-text {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+
 /* Bunnnavigasjon */
 .bottom-nav {
   position: absolute;
