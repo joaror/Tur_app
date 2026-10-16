@@ -11,12 +11,13 @@
 
     <script src="js/model.js"></script>
     <script src="js/common.js"></script>
+
+    <script src="js/loginPageView.js"></script>
+    <script src="js/loginPageController.js"></script>
     <script src="js/tripsPageView.js"></script>
     <script src="js/tripsPageController.js"></script>
-
     <script src="js/notesPageView.js"></script>
     <script src="js/notesPageController.js"></script>
-
     <script src="js/searchPageView.js"></script>
     <script src="js/searchPageController.js"></script>
     <script src="js/settingsPageView.js"></script>
@@ -25,7 +26,9 @@
     <script>
       // BRUKERHANDLING → CONTROLLER → MODELLENDRING → updateView() → NY HTML
       function updateView() {
-        if (model.app.currentPage === "tripsPage") {
+        if (model.app.currentPage === "loginPage") {
+          updateViewLoginPage();
+        } else if (model.app.currentPage === "tripsPage") {
           updateViewTripsPage();
         } else if (model.app.currentPage === "editTripsPage") {
           updateViewEditTripsPage();
