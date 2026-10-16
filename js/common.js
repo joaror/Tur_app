@@ -9,7 +9,7 @@
 
 /* Statuslinja er felles for alle sider. */
 function createStatusBarHtml() {
-    return /*HTML*/`
+  return /*HTML*/ `
         <div class="status-bar">
             <span class="time">09:41</span>
             <div class="status-icons">
@@ -30,47 +30,47 @@ function createStatusBarHtml() {
 /* Bunnnavigasjonen er felles for alle sider. activePage avgjør hvilken
    fane som er valgt, og sendes til goToPage() i controlleren. */
 function createBottomNavHtml(activePage) {
-    const turerActive = activePage === "tripsPage";
-    const sokActive = activePage === "searchPage";
-    const notaterActive = activePage === "notesPage";
-    const innstillingerActive = activePage === "settingsPage";
+  const turerActive = activePage === "tripsPage";
+  const sokActive = activePage === "searchPage";
+  const notaterActive = activePage === "notesPage";
+  const innstillingerActive = activePage === "settingsPage";
 
-    return /*HTML*/`
-        <nav class="bottom-nav">
-            <a class="nav-item ${turerActive ? 'active' : ''}" onclick="goToPage('tripsPage');" href="#">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
-                </svg>
-                <span>Turer</span>
-            </a>
-            <a class="nav-item ${sokActive ? 'active' : ''}" onclick="goToPage('searchPage');" href="#">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <span>Søk</span>
-            </a>
-            <a class="nav-item ${notaterActive ? 'active' : ''}" onclick="goToPage('notesPage');" href="#">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 20h9"></path>
-                    <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-                <span>Notater</span>
-            </a>
-            <a class="nav-item ${innstillingerActive ? 'active' : ''}" onclick="goToPage('settingsPage');" href="#">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path>
-                </svg>
-                <span>Innstillinger</span>
-            </a>
-        </nav>
+  return /*HTML*/ `
+    <nav class="bottom-nav">
+        <a class="nav-item ${turerActive ? "active" : ""}" onclick="goToPage('tripsPage');" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+            </svg>
+            <span>Turer</span>
+        </a>
+        <a class="nav-item ${notaterActive ? "active" : ""}" onclick="goToPage('notesPage');" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            <span>Notater</span>
+        </a>
+        <a class="nav-item ${sokActive ? "active" : ""}" onclick="goToPage('searchPage');" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>Søk</span>
+        </a>            
+        <a class="nav-item ${innstillingerActive ? "active" : ""}" onclick="goToPage('settingsPage');" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path>
+            </svg>
+            <span>Innstillinger</span>
+        </a>
+    </nav>
     `;
 }
 
 /* Den runde knappen som lager ny tur. */
 function createFloatingActionHtml(onclick, title) {
-    return /*HTML*/`
+  return /*HTML*/ `
         <a class="floating-action" title="${title}" onclick="${onclick}" href="#">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -85,79 +85,79 @@ function createFloatingActionHtml(onclick, title) {
 /* Finner et objekt i en liste på id. Vi bruker alltid id, aldri
    plasseringen i arrayen, som identitet. */
 function findObjectById(array, id) {
-    for (const object of array) {
-        if (object.id === id) {
-            return object;
-        }
+  for (const object of array) {
+    if (object.id === id) {
+      return object;
     }
+  }
 
-    return null;
+  return null;
 }
 
 /* Finner indeksen til et objekt i en liste på id. */
 function findIndexById(array, id) {
-    for (let i = 0; i < array.length; i++) {
-        if (array[i].id === id) {
-            return i;
-        }
+  for (let i = 0; i < array.length; i++) {
+    if (array[i].id === id) {
+      return i;
     }
+  }
 
-    return -1;
+  return -1;
 }
 
 /* Finner et bilde i model.data.images på id. */
 function findImageById(imageId) {
-    return findObjectById(model.data.images, imageId);
+  return findObjectById(model.data.images, imageId);
 }
 
 /* Finner navnet på en aktivitet, f.eks. "Fisketur". */
 function getActivityName(activityId) {
-    const activity = findObjectById(model.data.activities, activityId);
+  const activity = findObjectById(model.data.activities, activityId);
 
-    if (activity) {
-        return activity.activity;
-    }
+  if (activity) {
+    return activity.activity;
+  }
 
-    return "Ukjent aktivitet";
+  return "Ukjent aktivitet";
 }
 
 /* Finner navnet på et fylkesnavn, f.eks. "Nordland". */
 function getCountyName(countyId) {
-    const county = findObjectById(model.data.counties, countyId);
+  const county = findObjectById(model.data.counties, countyId);
 
-    if (county) {
-        return county.county;
-    }
+  if (county) {
+    return county.county;
+  }
 
-    return "Ukjent fylke";
+  return "Ukjent fylke";
 }
 
 /* Formaterer "2026-10-30" til "30. okt. 2026". */
 function formatDate(dateText) {
-    if (!dateText) {
-        return "";
-    }
+  if (!dateText) {
+    return "";
+  }
 
-    const date = new Date(dateText);
+  const date = new Date(dateText);
 
-    return date.toLocaleDateString("nb-NO", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-    });
+  return date.toLocaleDateString("nb-NO", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 /* Kortere utdrag av en lang tekst, til kortene på turlisten. */
 function createPreview(text) {
-    if (!text) {
-        return "";
-    }
+  if (!text) {
+    return "";
+  }
 
-    const maxLength = 80;
+  const maxLength = 80;
 
-    if (text.length <= maxLength) {
-        return text;
-    }
+  if (text.length <= maxLength) {
+    return text;
+  }
 
-    return text.substring(0, maxLength) + "...";
+  return text.substring(0, maxLength) + "...";
 }
