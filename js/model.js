@@ -94,8 +94,6 @@ const model = {
             { id: 3, topic: "Refleksjon" },
             { id: 4, topic: "Mål" },
             { id: 5, topic: "Tips" },
-            { id: 6, topic: "Høst" },
-            { id: 7, topic: "Sommer" },
         ],
 
         counties: [
