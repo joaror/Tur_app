@@ -98,8 +98,16 @@ function createTripListHtml(trips, emptyText) {
 
 function isFutureDate(dateString) {
   const tripDate = new Date(dateString);
+
+  // Check if the input string is actually a valid date
+  if (isNaN(tripDate.getTime())) {
+    console.error("Invalid date provided");
+    return false;
+  }
+
   const today = new Date();
 
+  // Reset both to midnight to compare only the calendar day
   tripDate.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
 
@@ -114,9 +122,16 @@ function createTripCardHtml(trip) {
   const dateText = formatDate(trip.date);
   const preview = createPreview(trip.description);
 
-  if (isDateInFuture(dateText)) {
-    console.log("Your trip is in the future!");
-  } else console.log("Your trip is not the future!");
+  if (isFutureDate(trip.date)) {
+    return /*HTML*/ `
+            <article class="trip-card" onclick="openTrip(${trip.id});">
+                <div class="trip-card-header">
+                    <span class="trip-type">${activityName}</span>
+                    <span class="trip-date">${dateText}</span>
+                </div>
+            </article>
+        `;
+  }
 
   return /*HTML*/ `
         <article class="trip-card" onclick="openTrip(${trip.id});">
