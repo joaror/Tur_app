@@ -1,6 +1,6 @@
 const model = {
     app: {
-        currentPage: "login",
+        currentPage: "loginPage",
     },
 
     viewState: {
@@ -8,6 +8,8 @@ const model = {
         loginPage: {
             userInput: "",
             passwordInput: "",
+            isPasswordVisible: false,
+            errorMessage: "",
         },
 
         // Ny tur
