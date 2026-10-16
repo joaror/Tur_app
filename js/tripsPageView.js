@@ -96,6 +96,16 @@ function createTripListHtml(trips, emptyText) {
   return html;
 }
 
+function isFutureDate(dateString) {
+  const tripDate = new Date(dateString);
+  const today = new Date();
+
+  tripDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  return tripDate > today;
+}
+
 /* Ett turkort. Aktivitet, fylke og bilder hentes med id fra modellen,
    slik at turen ikke inneholder hele objektene. */
 function createTripCardHtml(trip) {
@@ -103,6 +113,10 @@ function createTripCardHtml(trip) {
   const countyName = getCountyName(trip.countyId);
   const dateText = formatDate(trip.date);
   const preview = createPreview(trip.description);
+
+  if (isDateInFuture(dateText)) {
+    console.log("Your trip is in the future!");
+  } else console.log("Your trip is not the future!");
 
   return /*HTML*/ `
         <article class="trip-card" onclick="openTrip(${trip.id});">
