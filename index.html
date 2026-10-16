@@ -1,12 +1,49 @@
 <!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
-    </head>
-    <body>
-        <div id="app"></div>
-        <script src="model/model.js"></script>
-    </body>
+<html lang="nb">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Min friluft</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <main id="app"></main>
+
+    <script src="js/model.js"></script>
+    <script src="js/common.js"></script>
+
+    <script src="js/loginPageView.js"></script>
+    <script src="js/loginPageController.js"></script>
+    <script src="js/tripsPageView.js"></script>
+    <script src="js/tripsPageController.js"></script>
+    <script src="js/notesPageView.js"></script>
+    <script src="js/notesPageController.js"></script>
+    <script src="js/searchPageView.js"></script>
+    <script src="js/searchPageController.js"></script>
+    <script src="js/settingsPageView.js"></script>
+    <script src="js/settingsPageController.js"></script>
+
+    <script>
+      // BRUKERHANDLING → CONTROLLER → MODELLENDRING → updateView() → NY HTML
+      function updateView() {
+        if (model.app.currentPage === "loginPage") {
+          updateViewLoginPage();
+        } else if (model.app.currentPage === "tripsPage") {
+          updateViewTripsPage();
+        } else if (model.app.currentPage === "editTripsPage") {
+          updateViewEditTripsPage();
+        } else if (model.app.currentPage === "notesPage") {
+          updateViewNotesPage();
+        } else if (model.app.currentPage === "editNotesPage") {
+          updateViewEditNotesPage();
+        } else if (model.app.currentPage === "searchPage") {
+          updateViewSearchPage();
+        } else if (model.app.currentPage === "settingsPage") {
+          updateViewSettingsPage();
+        }
+      }
+
+      updateView();
+    </script>
+  </body>
 </html>
