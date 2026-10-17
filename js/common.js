@@ -161,3 +161,100 @@ function createPreview(text) {
 
   return text.substring(0, maxLength) + "...";
 }
+/* Neste ledige id i en liste. Vi bruker den når vi lager nye
+   turer og notater, slik at id-ene fortsetter etter der de slutter. */
+function getNextId(array) {
+    let biggestId = 0;
+
+    for (const object of array) {
+        if (object.id > biggestId) {
+            biggestId = object.id;
+        }
+    }
+
+    return biggestId + 1;
+}
+
+/* Sesongen regnes ut fra datoen, den lagres ikke på turen.
+   Mars–mai er vår, juni–august er sommer, september–november er høst,
+   desember–februar er vinter. */
+function getSeasonName(dateText) {
+    if (!dateText) {
+        return "";
+    }
+
+    const date = new Date(dateText);
+    const month = date.getMonth();
+
+    if (month >= 2 && month <= 4) {
+        return "Vår";
+    }
+
+    if (month >= 5 && month <= 7) {
+        return "Sommer";
+    }
+
+    if (month >= 8 && month <= 10) {
+        return "Høst";
+    }
+
+    return "Vinter";
+}
+/* Tilbakeknappen i toppteksten. Den bruker goToPage() i controlleren. */
+function createBackButtonHtml() {
+    return /*HTML*/ `
+        <a class="back-btn" onclick="goToPage('tripsPage');" href="#" title="Tilbake">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </a>
+    `;
+}
+/* Tidspunkt brukt på nye og endrede turer, på samme format
+   som updatedAt i modellen: 2026-10-06T19:24 */
+function getTimestamp() {
+  return new Date().toISOString().substring(0, 16);
+}
+
+/* Bygger <option>-taggene til en dropdown. Den valgte verdien
+   markeres med selected. */
+function createOptionHtml(value, text, selectedValue) {
+  const selected = selectedValue === value ? " selected" : "";
+
+  return /*HTML*/ `<option value="${value}"${selected}>${text}</option>`;
+}
+/* Tegner et bilde fra modellen. Hvert bilde peker på et motiv
+   i model.data.imageTemplates, som er en ferdig inline-SVG. */
+function createPictureSvgHtml(imageId) {
+  const image = findObjectById(model.data.images, imageId);
+
+  if (!image) {
+    return "";
+  }
+
+  const template = findObjectById(model.data.imageTemplates, image.templateId);
+
+  if (!template) {
+    return "";
+  }
+
+  return template.svg;
+}
+
+/* Navnet på bildet. Hvis det ikke er satt, bruker vi navnet
+   på motivet. */
+function getPictureLabel(imageId) {
+  const image = findObjectById(model.data.images, imageId);
+
+  if (!image) {
+    return "Bilde";
+  }
+
+  const template = findObjectById(model.data.imageTemplates, image.templateId);
+
+  if (template) {
+    return template.label;
+  }
+
+  return image.label ? image.label : "Bilde";
+}

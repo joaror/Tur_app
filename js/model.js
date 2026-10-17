@@ -23,6 +23,7 @@ const model = {
       countyId: null,
       description: "",
       pictures: [],
+      errorMessage: "",
     },
 
     editTripPage: {
@@ -34,12 +35,15 @@ const model = {
       countyId: null,
       description: "",
       pictures: [],
+      errorMessage: "",
     },
 
     // Turliste
     tripViewPage: {
       tripId: null,
-      pageNumber: null, // paging
+      pageNumber: 0, // paging av bildene
+      isMenuOpen: false,
+      isDeleteDialogOpen: false,
     },
 
     // Nytt notat
@@ -83,13 +87,13 @@ const model = {
 
   data: {
     activities: [
-      { id: 1, activity: "Skitur" },
+      { id: 1, activity: "Bærtur" },
       { id: 2, activity: "Båttur" },
       { id: 3, activity: "Gåtur" },
       { id: 4, activity: "Fisketur" },
-      { id: 5, activity: "Bærtur" },
-      { id: 6, activity: "Sykkeltur" },
-      { id: 7, activity: "Klatring" },
+      { id: 5, activity: "Klatring" },
+      { id: 6, activity: "Skitur" },
+      { id: 7, activity: "Sykkeltur" },
     ],
 
     topics: [
@@ -101,10 +105,10 @@ const model = {
     ],
 
     counties: [
-      { id: 1, county: "Oslo" },
+      { id: 1, county: "Agder" },
       { id: 2, county: "Innlandet" },
-      { id: 3, county: "Rogaland" },
-      { id: 4, county: "Nordland" },
+      { id: 3, county: "Oslo" },
+      { id: 4, county: "Rogaland" },
       { id: 5, county: "Vestfold" },
     ],
 
@@ -122,30 +126,89 @@ const model = {
         title: "Fisketur til Hammervatnet",
         location: "Hammervatnet",
         date: "2026-10-30",
-        countyId: 4,
-        pictures: [1, 2, 3],
+        countyId: 1,
+        pictures: [],
         description: "",
         updatedAt: "2026-10-06T19:24",
       },
       {
         id: 2,
-        activityId: 6,
+        activityId: 7,
         title: "Sykkeltur til Fjellheia",
         location: "Fjellheia",
         date: "2026-10-01",
-        countyId: 1,
+        countyId: 3,
         pictures: [4, 5],
-        description: "Klassisk tur til heia. Pent vær men ganske mange folk.",
+        description:
+          "Klassisk tur til heia. Pent vær men ganske mange folk. God sikt ned til fjordarmen og klare farger i løvfellet.",
         updatedAt: "2026-10-01T19:24",
+      },
+      {
+        id: 3,
+        activityId: 6,
+        title: "Bærtur til Holtet",
+        location: "Holtet",
+        date: "2026-08-15",
+        countyId: 3,
+        pictures: [1, 4],
+        description:
+          "Bærtur i skogen. På vei tilbake tok vi en pause ved vannet og spiste niste. Kom tilbake til bilen ved 16-tiden. Definitivt verdt turen!",
+        updatedAt: "2026-01-05T19:24",
+      },
+      {
+        id: 4,
+        activityId: 6,
+        title: "Skitur til Lyngsalpan",
+        location: "Lyngsalpan, Larvik",
+        date: "2026-01-04",
+        countyId: 4,
+        pictures: [1, 4, 5],
+        description:
+          "Fantastisk tur i høstsnø! Startet fra bommen ved 8-tiden og hadde strålende vær hele dagen. God sikt ned til fjordarmen og klare farger i løvfellet. Ingen problemer med snøforholdene - godt preparerte spor i store deler av turen. På vei ned tok vi en pause ved vannet og spiste niste. Kom tilbake til bilen ved 16-tiden. Definitivt verdt turen!",
+        updatedAt: "2026-01-05T19:24",
       },
     ],
 
     images: [
-      { id: 1, tripId: 3, label: "Bilde 1" },
-      { id: 2, tripId: 3, label: "Bilde 2" },
-      { id: 3, tripId: 3, label: "Bilde 3" },
-      { id: 4, tripId: 4, label: "Bilde 1" },
-      { id: 5, tripId: 4, label: "Bilde 2" },
+      { id: 1, tripId: 1, label: "Bilde 1", templateId: 1 },
+      { id: 2, tripId: 1, label: "Bilde 2", templateId: 2 },
+      { id: 3, tripId: 1, label: "Bilde 3", templateId: 3 },
+      { id: 4, tripId: 2, label: "Bilde 1", templateId: 4 },
+      { id: 5, tripId: 2, label: "Bilde 2", templateId: 6 },
+    ],
+
+    // Ferdige bilder vi kan bruke i stedet for å laste opp filer. Hvert motiv er en inline-SVG, så ingenting lagres til disk.
+    imageTemplates: [
+      {
+        id: 1,
+        label: "Fjell",
+        svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#cfe8ff"/><circle cx="76" cy="22" r="8" fill="#ffd54f"/><path d="M0 100 L35 35 L60 70 L75 50 L100 100 Z" fill="#78909c"/></svg>',
+      },
+      {
+        id: 2,
+        label: "Skog",
+        svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#e8f5e9"/><circle cx="20" cy="20" r="10" fill="#fff59d"/><path d="M0 100 L30 40 L55 100 Z" fill="#2e7d32"/><path d="M45 100 L72 32 L100 100 Z" fill="#1b5e20"/></svg>',
+      },
+      {
+        id: 3,
+        label: "Innsjø",
+        svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#e1f5fe"/><path d="M0 58 L30 28 L55 58 Z" fill="#90a4ae"/><rect y="58" width="100" height="42" fill="#4fc3f7"/><line x1="0" y1="58" x2="100" y2="58" stroke="#0288d1" stroke-width="2"/></svg>',
+      },
+      {
+        id: 4,
+        label: "Snø",
+        svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#e3f2fd"/><path d="M0 100 L50 18 L100 100 Z" fill="#eceff1"/><path d="M34 45 L50 18 L66 45 L50 37 Z" fill="#ffffff"/></svg>',
+      },
+      {
+        id: 5,
+        label: "Solnedgang",
+        svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#ffe0b2"/><rect width="100" height="58" fill="#ffab91"/><circle cx="50" cy="58" r="14" fill="#fff176"/><path d="M0 100 L30 68 L60 100 Z" fill="#6d4c41"/></svg>',
+      },
+      {
+        id: 6,
+        label: "Kyst",
+        svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#b3e5fc"/><path d="M8 54 L30 34 L46 54 Z" fill="#8d6e63"/><rect y="54" width="100" height="46" fill="#0288d1"/><line x1="0" y1="54" x2="100" y2="54" stroke="#01579b" stroke-width="2"/></svg>',
+      },
     ],
 
     // Notater
@@ -153,11 +216,26 @@ const model = {
       {
         id: 1,
         title: "Sesongplanlegging høst 2026",
-        date: "2026-10-05",
-        description:
-          "Bør prioritere turer i september–oktober før snøen legger seg i høyden.",
+        date: "2026-09-05",
+        description: `Bør prioritere turer i september–oktober før snøen legger seg i høyden. Har lyst til å prøve Nordkapp-turen igjen, kanskje kombinere med båt. Måltall for høsten er tre overnattingsturer og én fisketur. Utstyret er nesten klart, men sekken må byttes før           frosten setter inn. Neste steg: bestill billetter og legg inn planlagte turer i appen, slik at kalenderen viser hva som allerede er booket.`,
         topics: [1, 2, 5],
         updatedAt: "2026-10-06T19:24",
+      },
+      {
+        id: 2,
+        title: "Refleksjon etter sommeren",
+        date: "2026-09-01",
+        description: `Sommeren ble bra med mange båtturer. Skal prøve å få til flere overnattingsturer neste år. Bærturene var spesielt fine i år.`,
+        topics: [3],
+        updatedAt: "2026-10-01T19:24",
+      },
+      {
+        id: 3,
+        title: "Mål for sommeren",
+        date: "2026-05-30",
+        description: `1. Få til minst 2 overnattingsturer. 2. Prøve ny rute til Prekestolen. 3. Delta på fiskekurs i september.`,
+        topics: [1, 4],
+        updatedAt: "2026-05-30T19:24",
       },
     ],
   },
