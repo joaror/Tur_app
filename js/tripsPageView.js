@@ -330,7 +330,7 @@ function createTripInfoSectionHtml(trip) {
     `;
 }
 
-/* Bildene vises to og to. Hvilken side vi er på står i
+/* Bildene vises tre og tre. Hvilken side vi er på står i
    model.viewState.tripViewPage.pageNumber. */
 function createTripGallerySectionHtml(trip, pageNumber) {
   if (trip.pictures.length === 0) {
@@ -377,8 +377,8 @@ function createTripGallerySectionHtml(trip, pageNumber) {
   return html;
 }
 
-/* Bildene er delt i sider med to bilder per side. */
-const PICTURES_PER_PAGE = 2;
+/* Bildene er delt i sider med tre bilder per side. */
+const PICTURES_PER_PAGE = 3;
 
 /* Hvor mange sider bildene er delt i. */
 function countPicturePages(trip) {
