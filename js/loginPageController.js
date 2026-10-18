@@ -15,12 +15,11 @@ function handleLogin() {
   const userInput = login.userInput.trim();
   const passwordInput = login.passwordInput.trim();
 
-  // la bruker foreløpig fortsette uansett ved å klikke Logg inn
-  /*if (userInput === "" || passwordInput === "") {
+  if (userInput === "" || passwordInput === "") {
     login.errorMessage = "Fyll inn både e-post og passord.";
     updateView();
     return false;
-  }*/
+  }
 
   login.errorMessage = "";
   login.passwordInput = "";

@@ -14,10 +14,15 @@
     <div id="qunit-fixture"></div>
     <script src="https://code.jquery.com/qunit/qunit-3.0.0.js"></script>
 
-    <script src="../js/model.js"></script>
-    <script src="../js/common.js"></script>
-    <script src="../js/loginPageView.js"></script>
-    <script src="../js/loginPageController.js"></script>
+    <script src="js/model.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/loginPageView.js"></script>
+    <script src="js/loginPageController.js"></script>
+
+    <!-- Turene trenger også tripsPageView.js, fordi controlleren
+         bruker countPicturePages() når den deler bildene i sider. -->
+    <script src="js/tripsPageView.js"></script>
+    <script src="js/tripsPageController.js"></script>
 
     <script>
       // I testene teller vi bare hvor mange ganger controlleren ber om ny HTML.
@@ -27,6 +32,6 @@
       }
     </script>
 
-    <script src="../test/controllerTests.js"></script>
+    <script src="test/controllerTests.js"></script>
   </body>
 </html>
