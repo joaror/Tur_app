@@ -486,7 +486,7 @@ function updateViewNewTripPage() {
   updateViewTripForm(model.viewState.newTripPage, "newTripPage", false);
 }
 
-function updateViewEditTripsPage() {
+function updateViewEditTripPage() {
   updateViewTripForm(model.viewState.editTripPage, "editTripPage", true);
 }
 

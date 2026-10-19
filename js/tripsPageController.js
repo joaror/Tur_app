@@ -162,7 +162,7 @@ function editTrip(tripId) {
 
   model.viewState.tripViewPage.isMenuOpen = false;
 
-  model.app.currentPage = "editTripsPage";
+  model.app.currentPage = "editTripPage";
   updateView();
 }
 
