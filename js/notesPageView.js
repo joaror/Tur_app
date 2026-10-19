@@ -13,7 +13,7 @@ function updateViewNotesPage() {
                 </main>
 
                 ${createBottomNavHtml("notesPage")}
-                ${createFloatingActionHtml("goToPage('editNotesPage');", "Nytt notat")}
+                ${createFloatingActionHtml("goToPage('editNotePage');", "Nytt notat")}
             </div>
         </div>
     `;
@@ -22,6 +22,8 @@ function updateViewNotesPage() {
 // Denne må du se mer på Joakim ++ Funker til notater. 
 // Kan det være noe mer i common? Se på senere.
 // Topics må i newnote i viewstates. se mer på dette.
+
+// 
 
 function getTags(tags, styletag, modelobject) {
     let html = "";
@@ -56,6 +58,12 @@ function getNotes() {
     }
     return html;
 }
+
+// prototype rest 45 117
+// plussen funker ikke, lnje 16
+
+// topics knapper...
+
 
 // .form-body {
 //   flex: 1;
