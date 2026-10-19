@@ -59,7 +59,7 @@ function updateViewTripsPage() {
 
                 <main class="content">
                     <h2 class="section-title">Planlagte turer</h2>
-                    ${createTripListHtml(plannedTrips, "Ingen planlagte turer ennå.", false)}
+                    ${createTripListHtml(plannedTrips, "Ingen planlagte turer ennå.", true)}
 
                     <h2 class="section-title">Siste turer</h2>
                     ${createTripListHtml(doneTrips, "Ingen gjennomførte turer ennå.", true)}
@@ -74,8 +74,7 @@ function updateViewTripsPage() {
   document.getElementById("app").innerHTML = html;
 }
 
-/* Hent turene som ligger fram i tid, altså i dag eller senere.
-   Beregnes, lagres ikke. */
+/* Hent turene som ligger fram i tid, altså i dag eller senere. Beregnes, lagres ikke. */
 function getTripsPlannedFromToday() {
   const trips = [];
 
@@ -88,8 +87,7 @@ function getTripsPlannedFromToday() {
   return trips;
 }
 
-/* Hent turene som er gjennomført, altså før i dag.
-   Beregnes, lagres ikke. */
+/* Hent turene som er gjennomført, altså før i dag. Beregnes, lagres ikke. */
 function getTripsDoneBeforeToday() {
   const trips = [];
 
@@ -121,9 +119,8 @@ function createTripListHtml(trips, emptyText, newestFirst) {
   return html;
 }
 
-/* Sorterer turene etter dato. Vi bruker innsettingssortering, fordi
-   sort() med pilfunksjoner ikke er en del av verktøykassen.
-   Er newestFirst true, kommer den nyeste turen først. */
+/* Sorterer turene etter dato. Vi bruker innsettingssortering, fordi sort() med pilfunksjoner ikke er 
+   en del av verktøykassen. Er newestFirst true, kommer den nyeste turen først. */
 function sortTripsByDate(trips, newestFirst) {
   const sorted = trips.slice();
 
@@ -152,9 +149,8 @@ function sortTripsByDate(trips, newestFirst) {
   return sorted;
 }
 
-/* Sjekker om en dato er i dag eller senere. Vi ser bare på kalenderdagen,
-   ikke på klokketiden. En tur som er planlagt for i dag, er ennå ikke
-   gjennomført, og regnes derfor som planlagt. */
+/* Sjekker om en dato er i dag eller senere. Vi ser bare på kalenderdagen, ikke på klokketiden. En tur 
+   som er planlagt for i dag, er ennå ikke gjennomført, og regnes derfor som planlagt. */
 function isDateTodayOrLater(dateString) {
   if (!dateString) {
     return false;
@@ -176,8 +172,8 @@ function isDateTodayOrLater(dateString) {
   return date >= today;
 }
 
-/* Ett turkort. Aktivitet, fylke og bilder hentes med id fra modellen,
-   slik at turen ikke inneholder hele objektene. */
+/* Ett turkort. Aktivitet, fylke og bilder hentes med id fra modellen, slik at turen ikke inneholder 
+   hele objektene. */
 function createTripCardHtml(trip) {
   const activityName = getActivityName(trip.activityId);
   const countyName = getCountyName(trip.countyId);

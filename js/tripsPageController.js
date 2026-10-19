@@ -4,10 +4,37 @@
    Controller håndterer brukerhandlinger og endrer modellen.
    Controller bygger ikke HTML. Etter hver endring kalles updateView().
 
-   Brukerhandlinger:
-     openTrip(tripId)   – åpne en tur, blir vist i viewState
-     startNewTrip()     – gå til skjemaet for ny tur
-     goToPage(page)     – bytte side fra bunnnavigasjonen
+  Funksjoner:
+    openTrip(tripId)       // Åpner en eksisterende tur
+    startNewTrip()         // Starter et nytt tur-skjema
+    toggleTripMenu()       // Viser/skjuler menyen på turvisning
+    askDeleteTrip()        // Viser dialog for å slette tur
+    cancelDeleteTrip()     // Skjuler dialog for å slette tur
+    confirmDeleteTrip()    // Sletter tur og bilder som hører til
+    duplicateTrip()        // Lager en kopi av turen og bildene som hører til
+    editTrip(tripId)       // Åpner et eksisterende tur-skjema
+    showPreviousPictures() // Viser forrige side med bilder
+    showNextPictures()     // Viser neste side med bilder
+    saveNewTrip()          // Lagrer ny tur og knytter bildene som hører til
+    saveEditedTrip()       // Lagrer endringer på tur og knytter bildene som hører til
+    cancelNewTripForm()    // Avbryter nytt tur-skjema og sletter bilder som ikke ble lagret
+    cancelEditTripForm()   // Avbryter redigering av tur og sletter bilder som ikke ble lagret
+    addPictureToNewTripForm()  // Legger til et bilde i nytt tur-skjema
+    addPictureToEditTripForm() // Legger til et bilde i rediger tur-skjema
+    removePictureFromNewTripForm(pictureId)  // Fjerner et bilde fra nytt tur-skjema
+    removePictureFromEditTripForm(pictureId) // Fjerner et bilde fra rediger tur-skjema
+    isTripFormValid(form)  // Sjekker om skjemaet er gyldig
+    clearTripForm(form)    // Tømmer et skjema, slik at det ikke husker halvutfylte verdier
+    addPictureToForm(form) // Legger til et bilde i skjemaet
+    getNextTemplateId(pictureCount)        // Henter neste motiv for et bilde, slik at motivene går i runde
+    removePictureFromForm(form, pictureId) // Fjerner et bilde fra skjemaet, og sletter det hvis det ikke hører til noen tur
+    linkPicturesToTrip(pictureIds, tripId) // Knytter bildene i skjemaet til turen, og sletter bilder som ikke lenger hører til turen
+    deleteUnsavedPictures(form)  // Sletter bilder som ble lagt til i skjemaet, men som aldri ble lagret
+    deleteImagesForTrip(trip)    // Sletter bildene som hører til en tur, men ikke brukes av noen annen tur
+    duplicateImagesForTrip(trip) // Lager nye bildeobjekter for kopien, og gir turen de nye id-ene
+    isImageUsedByTrip(pictureId) // Sjekker om et bilde hører til noen tur
+    removeImageById(pictureId)   // Sletter ett bilde fra model.data.images
+
    ========================================================================== */
 
 function openTrip(tripId) {
@@ -37,20 +64,6 @@ function startNewTrip() {
   model.app.currentPage = "newTripPage";
   updateView();
 }
-
-/* ==========================================================================
-   Turdetaljer
-
-   Brukerhandlinger:
-     toggleTripMenu()      – åpne og lukke overleggsmenyen
-     askDeleteTrip()       – vis bekreftelsesdialogen
-     cancelDeleteTrip()    – lukke dialogen, turen beholdes
-     confirmDeleteTrip()   – slette turen og bildene
-     duplicateTrip()       – lage en kopi av turen
-     editTrip(tripId)      – fylle ut skjemaet for redigering
-     showPreviousPictures()– forrige side i bildene
-     showNextPictures()    – neste side i bildene
-   ========================================================================== */
 
 function toggleTripMenu() {
   const tripView = model.viewState.tripViewPage;
@@ -84,8 +97,8 @@ function confirmDeleteTrip() {
     return;
   }
 
-  /* Turen tas bort før bildene slettes. Da ser vi ikke lenger turen
-     når vi sjekker om et bilde brukes av noen annen tur. */
+  /* Turen tas bort før bildene slettes. Da ser vi ikke lenger turen når vi sjekker om et bilde brukes av noen 
+     annen tur. */
   const index = findIndexById(model.data.trips, trip.id);
 
   if (index !== -1) {
@@ -110,8 +123,7 @@ function duplicateTrip() {
     return;
   }
 
-  /* Vi lager et nytt objekt. Vi skyver ikke inn view state
-       i domenedata, og kopien deler ikke objekt med originalen. */
+  /* Vi lager et nytt objekt. Vi skyver ikke inn view state i domenedata, og kopien deler ikke objekt med originalen. */
   const newTripId = getNextId(model.data.trips);
   const newTrip = {
     id: newTripId,
@@ -198,20 +210,6 @@ function showNextPictures() {
   updateView();
 }
 
-/* ==========================================================================
-   Turskjema
-
-   Brukerhandlinger:
-     saveNewTrip()                        – lagre en ny tur
-     saveEditedTrip()                     – lagre endringene på en tur
-     cancelNewTripForm()                  – avbryte ny tur
-     cancelEditTripForm()                 – avbryte redigering
-     addPictureToNewTripForm()            – legge til bilde på ny tur
-     addPictureToEditTripForm()           – legge til bilde på en tur
-     removePictureFromNewTripForm(id)     – fjerne bilde fra ny tur
-     removePictureFromEditTripForm(id)    – fjerne bilde fra en tur
-   ========================================================================== */
-
 function saveNewTrip() {
   const form = model.viewState.newTripPage;
 
@@ -221,8 +219,8 @@ function saveNewTrip() {
     return;
   }
 
-  /* Vi lager et nytt objekt. View state skal ikke bli liggende
-       som domenedata, så vi kopierer feltene over i et nytt tur-objekt. */
+  /* Vi lager et nytt objekt. View state skal ikke bli liggende som domenedata, så vi kopierer feltene over 
+     i et nytt tur-objekt. */
   const newTripId = getNextId(model.data.trips);
   const newTrip = {
     id: newTripId,
@@ -233,6 +231,7 @@ function saveNewTrip() {
     countyId: form.countyId,
     description: form.description,
     pictures: [],
+    updatedAt: getTimestamp(),
   };
 
   model.data.trips.push(newTrip);
@@ -269,17 +268,16 @@ function saveEditedTrip() {
     return;
   }
 
-  /* Her endrer vi den eksisterende turen. Vanlig mutasjon er greit,
-       fordi turen allerede er et domenobjekt. */
+  /* Her endrer vi den eksisterende turen. Vanlig mutasjon er greit, fordi turen allerede er et domenobjekt. */
   trip.activityId = form.activityId;
   trip.title = form.title.trim();
   trip.location = form.location.trim();
   trip.date = form.date;
   trip.countyId = form.countyId;
   trip.description = form.description;
+  trip.updatedAt = getTimestamp();
 
-  /* Turens pictures-liste følger skjemaet, og bilder som ble fjernet
-     fra skjemaet, blir slettet. */
+  /* Turens pictures-liste følger skjemaet, og bilder som ble fjernet fra skjemaet, blir slettet. */
   linkPicturesToTrip(form.pictures, trip.id);
 
   clearTripForm(model.viewState.editTripPage);
@@ -339,15 +337,12 @@ function removePictureFromEditTripForm(pictureId) {
   updateView();
 }
 
-/* --- Hjelpefunksjoner ----------------------------------------------------- */
-
 /* Et skjema er gyldig når tittel og dato er fyllt inn. */
 function isTripFormValid(form) {
   return form.title.trim() !== "" && form.date !== "" && form.date !== null;
 }
 
-/* Tømmer et skjemafelt, slik at et halvutfylt skjema
-   ikke ligger igjen neste gang siden åpnes. */
+/* Tømmer et skjemafelt, slik at et halvutfylt skjema ikke ligger igjen neste gang siden åpnes. */
 function clearTripForm(form) {
   form.activityId = null;
   form.title = "";
@@ -359,8 +354,7 @@ function clearTripForm(form) {
   form.errorMessage = "";
 }
 
-/* Legger til et bilde i skjemaet. Bildet ligger i model.data.images,
-   men det står ikke i noen tur sin pictures-liste ennå. */
+/* Legger til et bilde i skjemaet. Bildet ligger i model.data.images, men det står ikke i noen tur sin pictures-liste ennå. */
 function addPictureToForm(form) {
   const pictureId = getNextId(model.data.images);
 
@@ -379,8 +373,8 @@ function getNextTemplateId(pictureCount) {
   return templates[pictureCount % templates.length].id;
 }
 
-/* Fjerner ett bilde fra skjemaet. Et bilde som ikke hører til noen tur,
-   slettes også, slik at vi ikke lar ubrukte bilder ligge i modellen. */
+/* Fjerner ett bilde fra skjemaet. Et bilde som ikke hører til noen tur, slettes også, slik at vi ikke lar 
+  ubrukte bilder ligge i modellen. */
 function removePictureFromForm(form, pictureId) {
   const index = form.pictures.indexOf(pictureId);
 
@@ -393,8 +387,8 @@ function removePictureFromForm(form, pictureId) {
   }
 }
 
-/* Knytter bildene i skjemaet til turen, og sletter bilder som hørte til
-   turen, men som ikke er med i skjemaet lenger. */
+/* Knytter bildene i skjemaet til turen, og sletter bilder som hørte til turen, men som ikke er med i skjemaet 
+  lenger. */
 function linkPicturesToTrip(pictureIds, tripId) {
   const trip = findObjectById(model.data.trips, tripId);
 
@@ -417,8 +411,7 @@ function linkPicturesToTrip(pictureIds, tripId) {
   }
 }
 
-/* Sletter bilder som ble lagt til i skjemaet, men som aldri
-   ble lagret. Kalles når brukeren avbryter. */
+/* Sletter bilder som ble lagt til i skjemaet, men som aldri ble lagret. Kalles når brukeren avbryter. */
 function deleteUnsavedPictures(form) {
   for (const pictureId of form.pictures) {
     if (!isImageUsedByTrip(pictureId)) {
@@ -427,9 +420,8 @@ function deleteUnsavedPictures(form) {
   }
 }
 
-/* Sletter bildene som hører til en tur. Turen skal være fjernet fra
-   modellen først, slik at vi ikke teller turen selv. Et bilde som også
-   brukes av en annen tur, blir beholdt. */
+/* Sletter bildene som hører til en tur. Turen skal være fjernet fra modellen først, slik at vi ikke teller 
+   turen selv. Et bilde som også brukes av en annen tur, blir beholdt. */
 function deleteImagesForTrip(trip) {
   for (const pictureId of trip.pictures) {
     if (!isImageUsedByTrip(pictureId)) {
@@ -438,9 +430,8 @@ function deleteImagesForTrip(trip) {
   }
 }
 
-/* Lager nye bildeobjekter for kopien, og gir turen de nye id-ene.
-   Bildene kopieres ikke, slik at originalen og kopien kan endres
-   hver for seg. */
+/* Lager nye bildeobjekter for kopien, og gir turen de nye id-ene. Bildene kopieres ikke, slik at originalen 
+   og kopien kan endres hver for seg. */
 function duplicateImagesForTrip(trip) {
   const pictureIds = [];
 
@@ -463,9 +454,8 @@ function duplicateImagesForTrip(trip) {
   return pictureIds;
 }
 
-/* Sjekker om et bilde hører til noen tur. Bildene på en tur står
-   i turens pictures-liste, så det er den som sier hvem som hører
-   til hverandre. */
+/* Sjekker om et bilde hører til noen tur. Bildene på en tur står i turens pictures-liste, så det er den som 
+  sier hvem som hører til hverandre. */
 function isImageUsedByTrip(pictureId) {
   for (const trip of model.data.trips) {
     if (trip.pictures.includes(pictureId)) {
