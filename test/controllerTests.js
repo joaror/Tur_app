@@ -177,7 +177,7 @@ QUnit.module("togglePasswordVisibility", function () {
    model.data.images) og view state. Derfor tar resetTripTest() et
    bilde av utgangspunktet før første test, og legger alt tilbake
    før hver test. Slik kan testene regne med de samme fem turene
-   og de samme seks bildene hver gang, uansett hva de gjør.
+   og de samme elleve bildene hver gang, uansett hva de gjør.
    ========================================================================== */
 
 let tripTestSnapshot = null;
@@ -198,12 +198,46 @@ function resetTripTest() {
     model.data.trips = JSON.parse(JSON.stringify(tripTestSnapshot.trips));
     model.data.images = JSON.parse(JSON.stringify(tripTestSnapshot.images));
 
-    Object.assign(model.viewState.newTripPage, JSON.parse(JSON.stringify(tripTestSnapshot.newTripPage)));
-    Object.assign(model.viewState.editTripPage, JSON.parse(JSON.stringify(tripTestSnapshot.editTripPage)));
-    Object.assign(model.viewState.tripViewPage, JSON.parse(JSON.stringify(tripTestSnapshot.tripViewPage)));
+    copyNewTripForm(model.viewState.newTripPage, tripTestSnapshot.newTripPage);
+    copyEditTripForm(model.viewState.editTripPage, tripTestSnapshot.editTripPage);
+    copyTripViewState(model.viewState.tripViewPage, tripTestSnapshot.tripViewPage);
 
     model.app.currentPage = tripTestSnapshot.currentPage;
     updateViewCallCount = 0;
+}
+
+/* Kopierer skjemaet for ny tur. Vi lister feltene eksplisitt, fordi
+   Object.assign() ikke er en del av verktøykassen. */
+function copyNewTripForm(form, values) {
+    form.activityId = values.activityId;
+    form.title = values.title;
+    form.location = values.location;
+    form.date = values.date;
+    form.countyId = values.countyId;
+    form.description = values.description;
+    form.pictures = values.pictures;
+    form.errorMessage = values.errorMessage;
+}
+
+/* Kopierer skjemaet for redigering. */
+function copyEditTripForm(form, values) {
+    form.tripId = values.tripId;
+    form.activityId = values.activityId;
+    form.title = values.title;
+    form.location = values.location;
+    form.date = values.date;
+    form.countyId = values.countyId;
+    form.description = values.description;
+    form.pictures = values.pictures;
+    form.errorMessage = values.errorMessage;
+}
+
+/* Kopierer view state for turvisningen. */
+function copyTripViewState(viewState, values) {
+    viewState.tripId = values.tripId;
+    viewState.pageNumber = values.pageNumber;
+    viewState.isMenuOpen = values.isMenuOpen;
+    viewState.isDeleteDialogOpen = values.isDeleteDialogOpen;
 }
 
 /* En tur til å bruke i testene. Feltene kan overstyres. */
@@ -217,15 +251,28 @@ function createTestTrip(overrides) {
         countyId: 2,
         pictures: [],
         description: "En tur laget av en test.",
-        updatedAt: "2026-05-05T10:00",
     };
 
-    return Object.assign(trip, overrides || {});
+    if (!overrides) {
+        return trip;
+    }
+
+    if (overrides.id !== undefined) { trip.id = overrides.id; }
+    if (overrides.activityId !== undefined) { trip.activityId = overrides.activityId; }
+    if (overrides.title !== undefined) { trip.title = overrides.title; }
+    if (overrides.location !== undefined) { trip.location = overrides.location; }
+    if (overrides.date !== undefined) { trip.date = overrides.date; }
+    if (overrides.countyId !== undefined) { trip.countyId = overrides.countyId; }
+    if (overrides.pictures !== undefined) { trip.pictures = overrides.pictures; }
+    if (overrides.description !== undefined) { trip.description = overrides.description; }
+
+    return trip;
 }
 
-/* Et bilde til å bruke i testene. */
-function createTestImage(id, tripId) {
-    return { id: id, tripId: tripId, label: "Bilde", templateId: 1 };
+/* Et bilde til å bruke i testene. Et bilde hører til en tur når
+   turens pictures-liste inneholder bildets id. */
+function createTestImage(id, templateId) {
+    return { id: id, templateId: templateId };
 }
 
 /* Legger inn en tur i modellen og åpner den. */
@@ -239,30 +286,53 @@ function openTestTrip(overrides) {
     return trip;
 }
 
+/* Standardverdiene for skjemaet for ny tur. */
+const NEW_TRIP_FORM_VALUES = {
+    activityId: 4,
+    title: "Ny testtur",
+    location: "Nytt teststed",
+    date: "2026-06-01",
+    countyId: 1,
+    description: "Kort om turen.",
+    pictures: [],
+};
+
+/* Standardverdiene for skjemaet for redigering av en tur. */
+const EDIT_TRIP_FORM_VALUES = {
+    tripId: 1,
+    activityId: 4,
+    title: "Endret tittel",
+    location: "Endret sted",
+    date: "2026-06-02",
+    countyId: 3,
+    description: "Endret beskrivelse.",
+    pictures: [],
+};
+
+/* Legger verdier inn i et skjema. Bare feltene som er satt, blir
+   endret. Vi lister feltene eksplisitt, fordi Object.assign() ikke
+   er en del av verktøykassen. */
+function setFormValues(form, values) {
+    if (values.tripId !== undefined) { form.tripId = values.tripId; }
+    if (values.activityId !== undefined) { form.activityId = values.activityId; }
+    if (values.title !== undefined) { form.title = values.title; }
+    if (values.location !== undefined) { form.location = values.location; }
+    if (values.date !== undefined) { form.date = values.date; }
+    if (values.countyId !== undefined) { form.countyId = values.countyId; }
+    if (values.description !== undefined) { form.description = values.description; }
+    if (values.pictures !== undefined) { form.pictures = values.pictures; }
+}
+
 /* Fyller inn skjemaet for ny tur. */
 function fillNewTripForm(values) {
-    Object.assign(model.viewState.newTripPage, {
-        activityId: 4,
-        title: "Ny testtur",
-        location: "Nytt teststed",
-        date: "2026-06-01",
-        countyId: 1,
-        description: "Kort om turen.",
-    }, values || {});
+    setFormValues(model.viewState.newTripPage, NEW_TRIP_FORM_VALUES);
+    setFormValues(model.viewState.newTripPage, values || {});
 }
 
 /* Fyller inn skjemaet for redigering av en tur. */
 function fillEditTripForm(values) {
-    Object.assign(model.viewState.editTripPage, {
-        tripId: 1,
-        activityId: 4,
-        title: "Endret tittel",
-        location: "Endret sted",
-        date: "2026-06-02",
-        countyId: 3,
-        description: "Endret beskrivelse.",
-        pictures: [],
-    }, values || {});
+    setFormValues(model.viewState.editTripPage, EDIT_TRIP_FORM_VALUES);
+    setFormValues(model.viewState.editTripPage, values || {});
 }
 
 QUnit.module("openTrip", function () {
@@ -415,7 +485,8 @@ QUnit.module("cancelDeleteTrip", function () {
 QUnit.module("confirmDeleteTrip", function () {
     QUnit.test("sletter turen og bildene dens", function (assert) {
         resetTripTest();
-        /* Tur 2 har bildene 4, 5 og 6, tur 3 har bildene 1 og 4. */
+        /* Tur 2 har bildene 4 og 5. Bildene 6, 7 og 8 hører til
+           andre turer, og skal bli beholdt. */
         model.viewState.tripViewPage.tripId = 2;
 
         confirmDeleteTrip();
@@ -424,7 +495,7 @@ QUnit.module("confirmDeleteTrip", function () {
         assert.equal(model.data.trips.length, 4, "fire turer igjen");
         assert.equal(findImageById(4), null, "bilde 4 er borte");
         assert.equal(findImageById(5), null, "bilde 5 er borte");
-        assert.equal(findImageById(6), null, "bilde 6 er borte");
+        assert.notEqual(findImageById(6), null, "bilde 6 til en annen tur er beholdt");
     });
 
     QUnit.test("går tilbake til turlisten", function (assert) {
@@ -442,7 +513,8 @@ QUnit.module("confirmDeleteTrip", function () {
     QUnit.test("bilder til andre turer blir beholdt", function (assert) {
         resetTripTest();
         model.data.trips.push(createTestTrip({ id: 900, pictures: [90] }));
-        model.data.images.push(createTestImage(90, 900));
+        model.data.trips.push(createTestTrip({ id: 901, pictures: [91] }));
+        model.data.images.push(createTestImage(90, 1));
         model.data.images.push(createTestImage(91, 1));
         model.viewState.tripViewPage.tripId = 900;
 
@@ -453,16 +525,16 @@ QUnit.module("confirmDeleteTrip", function () {
         assert.notEqual(findImageById(1), null, "de opprinnelige bildene er beholdt");
     });
 
-    QUnit.test("bilder i turens pictures-liste slettes også", function (assert) {
-        /* Tur 2 har bildene 1, 2, 4 og 5, så selv om bildene 1 og 2
-           peker på andre turer, skal de borte når tur 2 slettes. */
+    QUnit.test("bilder som ikke hører til turen blir beholdt", function (assert) {
+        /* Tur 2 har bildene 4 og 5. Bildene 1 og 3 hører til tur 1,
+           og skal bli beholdt når tur 2 slettes. */
         resetTripTest();
         model.viewState.tripViewPage.tripId = 2;
 
         confirmDeleteTrip();
 
-        assert.equal(findImageById(1), null, "bilde 1 sto i turens pictures-liste");
-        assert.notEqual(findImageById(3), null, "bilde 3 sto ikke i listen");
+        assert.notEqual(findImageById(1), null, "bilde 1 hører til tur 1");
+        assert.notEqual(findImageById(3), null, "bilde 3 hører til tur 1");
     });
 
     QUnit.test("ukjent tur sletter ingenting", function (assert) {
@@ -502,7 +574,7 @@ QUnit.module("duplicateTrip", function () {
     QUnit.test("kopien får egne bilder", function (assert) {
         resetTripTest();
         model.data.trips.push(createTestTrip({ id: 900, pictures: [90] }));
-        model.data.images.push(createTestImage(90, 900));
+        model.data.images.push(createTestImage(90, 1));
         model.viewState.tripViewPage.tripId = 900;
 
         duplicateTrip();
@@ -511,8 +583,8 @@ QUnit.module("duplicateTrip", function () {
 
         assert.equal(kopi.pictures.length, 1, "kopien fikk ett bilde");
         assert.notEqual(kopi.pictures[0], 90, "kopien peker på et nytt bilde");
-        assert.equal(findImageById(90).tripId, 900, "originalens bilde er ikke flyttet");
-        assert.equal(findImageById(kopi.pictures[0]).tripId, 901, "det nye bildet peker på kopien");
+        assert.notEqual(findImageById(90), null, "originalens bilde er ikke flyttet");
+        assert.notEqual(findImageById(kopi.pictures[0]), null, "kopien har sitt eget bilde");
         assert.equal(findImageById(kopi.pictures[0]).templateId, 1, "motivet er kopiert");
     });
 
@@ -531,7 +603,7 @@ QUnit.module("duplicateTrip", function () {
 
     QUnit.test("turer uten bilder kopieres uten bilder", function (assert) {
         resetTripTest();
-        model.viewState.tripViewPage.tripId = 1;
+        model.viewState.tripViewPage.tripId = 5;
 
         duplicateTrip();
 
@@ -559,7 +631,7 @@ QUnit.module("editTrip", function () {
 
         const form = model.viewState.editTripPage;
 
-        assert.equal(model.app.currentPage, "editTripsPage", "vi er i redigeringsskjemaet");
+        assert.equal(model.app.currentPage, "editTripPage", "vi er i redigeringsskjemaet");
         assert.equal(form.tripId, 2, "skjemaet vet hvilken tur det er");
         assert.equal(form.activityId, 7, "aktiviteten er hentet");
         assert.equal(form.title, "Sykkeltur til Fjellheia", "tittelen er hentet");
@@ -598,7 +670,7 @@ QUnit.module("editTrip", function () {
         model.viewState.editTripPage.pictures = [];
 
         assert.equal(findObjectById(model.data.trips, 2).title, "Sykkeltur til Fjellheia", "turen er uendret");
-        assert.equal(findObjectById(model.data.trips, 2).pictures.length, 4, "turen har fortsatt bildene sine");
+        assert.equal(findObjectById(model.data.trips, 2).pictures.length, 2, "turen har fortsatt bildene sine");
     });
 
     QUnit.test("ukjent tur åpner ikke skjemaet", function (assert) {
@@ -660,7 +732,7 @@ QUnit.module("showNextPictures og showPreviousPictures", function () {
 
     QUnit.test("turer uten bilder har én tom side", function (assert) {
         resetTripTest();
-        model.viewState.tripViewPage.tripId = 1;
+        model.viewState.tripViewPage.tripId = 5;
 
         showNextPictures();
 
@@ -749,18 +821,6 @@ QUnit.module("saveNewTrip", function () {
         assert.equal(form.errorMessage, "", "feilmeldingen er borte");
     });
 
-    QUnit.test("tidspunkt settes på den nye turen", function (assert) {
-        resetTripTest();
-        fillNewTripForm();
-
-        saveNewTrip();
-
-        const tur = findObjectById(model.data.trips, model.viewState.tripViewPage.tripId);
-
-        assert.notEqual(tur.updatedAt, "", "updatedAt er satt");
-        assert.notEqual(tur.updatedAt, "2026-05-05T10:00", "updatedAt er ikke fra testturen");
-    });
-
     QUnit.test("bildene kobles til den nye turen", function (assert) {
         resetTripTest();
         fillNewTripForm();
@@ -772,7 +832,8 @@ QUnit.module("saveNewTrip", function () {
         const tur = findObjectById(model.data.trips, model.viewState.tripViewPage.tripId);
 
         assert.deepEqual(tur.pictures, [bildeId], "turen har bildet");
-        assert.equal(findImageById(bildeId).tripId, tur.id, "bildet peker på turen");
+        assert.notEqual(findImageById(bildeId), null, "bildet ligger i modellen");
+        assert.equal(isImageUsedByTrip(bildeId), true, "bildet hører nå til turen");
     });
 });
 
@@ -780,7 +841,7 @@ QUnit.module("saveEditedTrip", function () {
     QUnit.test("manglende tittel gir feilmelding", function (assert) {
         resetTripTest();
         fillEditTripForm({ tripId: 2, title: "" });
-        model.app.currentPage = "editTripsPage";
+        model.app.currentPage = "editTripPage";
 
         saveEditedTrip();
 
@@ -790,7 +851,7 @@ QUnit.module("saveEditedTrip", function () {
             "errorMessage er satt",
         );
         assert.equal(findObjectById(model.data.trips, 2).title, "Sykkeltur til Fjellheia", "turen er uendret");
-        assert.equal(model.app.currentPage, "editTripsPage", "vi blir i skjemaet");
+        assert.equal(model.app.currentPage, "editTripPage", "vi blir i skjemaet");
     });
 
     QUnit.test("endrer den eksisterende turen", function (assert) {
@@ -807,7 +868,6 @@ QUnit.module("saveEditedTrip", function () {
         assert.equal(tur.date, "2026-06-02", "datoen er endret");
         assert.equal(tur.activityId, 4, "aktiviteten er endret");
         assert.equal(tur.countyId, 3, "fylket er endret");
-        assert.notEqual(tur.updatedAt, "2026-10-01T19:24", "updatedAt er oppdatert");
     });
 
     QUnit.test("turen åpnes etter lagring", function (assert) {
@@ -836,15 +896,14 @@ QUnit.module("saveEditedTrip", function () {
 
     QUnit.test("bilder som er fjernet fra skjemaet, slettes", function (assert) {
         resetTripTest();
-        /* Tur 2 har bildene 4, 5 og 6. Skjemaet tar med 4 og 6. */
-        fillEditTripForm({ tripId: 2, pictures: [4, 6] });
+        /* Tur 2 har bildene 4 og 5. Skjemaet tar med bare 4. */
+        fillEditTripForm({ tripId: 2, pictures: [4] });
 
         saveEditedTrip();
 
-        assert.equal(findImageById(4).tripId, 2, "bilde 4 er beholdt");
-        assert.equal(findImageById(6).tripId, 2, "bilde 6 er beholdt");
+        assert.notEqual(findImageById(4), null, "bilde 4 er beholdt");
         assert.equal(findImageById(5), null, "bilde 5 er slettet");
-        assert.deepEqual(findObjectById(model.data.trips, 2).pictures, [4, 6], "turen har de to bildene");
+        assert.deepEqual(findObjectById(model.data.trips, 2).pictures, [4], "turen har bare bildet 4");
     });
 
     QUnit.test("nytt bilde i skjemaet kobles til turen", function (assert) {
@@ -855,7 +914,7 @@ QUnit.module("saveEditedTrip", function () {
 
         saveEditedTrip();
 
-        assert.equal(findImageById(bildeId).tripId, 1, "bildet peker på turen");
+        assert.notEqual(findImageById(bildeId), null, "bildet ligger i modellen");
         assert.deepEqual(findObjectById(model.data.trips, 1).pictures, [bildeId], "turen har bildet");
     });
 
@@ -897,7 +956,7 @@ QUnit.module("cancelNewTripForm", function () {
         cancelNewTripForm();
 
         assert.equal(findImageById(bildeId), null, "bildet ble slettet");
-        assert.equal(model.data.images.length, 6, "vi har de opprinnelige bildene igjen");
+        assert.equal(model.data.images.length, 11, "vi har de opprinnelige bildene igjen");
     });
 
     QUnit.test("lagrede bilder beholdes", function (assert) {
@@ -923,7 +982,7 @@ QUnit.module("cancelEditTripForm", function () {
     QUnit.test("går tilbake til turen vi kom fra", function (assert) {
         resetTripTest();
         fillEditTripForm({ tripId: 2, title: "Endret tittel" });
-        model.app.currentPage = "editTripsPage";
+        model.app.currentPage = "editTripPage";
 
         cancelEditTripForm();
 
@@ -991,7 +1050,7 @@ QUnit.module("addPictureToForm", function () {
         const bildeId = model.viewState.newTripPage.pictures[0];
 
         assert.equal(model.data.images.length, antallBilderFoer + 1, "bildet ble lagret i modellen");
-        assert.equal(findImageById(bildeId).tripId, null, "bildet hører ikke til en tur ennå");
+        assert.equal(isImageUsedByTrip(bildeId), false, "bildet hører ikke til en tur ennå");
         assert.equal(updateViewCallCount, 1, "updateView ble kalt én gang");
     });
 
@@ -1004,7 +1063,7 @@ QUnit.module("addPictureToForm", function () {
         const bildeId = model.viewState.editTripPage.pictures[0];
 
         assert.equal(model.viewState.editTripPage.pictures.length, 1, "skjemaet har ett bilde");
-        assert.equal(findImageById(bildeId).tripId, null, "bildet hører ikke til en tur ennå");
+        assert.equal(isImageUsedByTrip(bildeId), false, "bildet hører ikke til en tur ennå");
     });
 
     QUnit.test("motivene går i runde", function (assert) {
@@ -1015,11 +1074,13 @@ QUnit.module("addPictureToForm", function () {
             addPictureToNewTripForm();
         }
 
-        const templateId = model.viewState.newTripPage.pictures.map(function (bildeId) {
-            return findImageById(bildeId).templateId;
-        });
+        const templateIds = [];
 
-        assert.deepEqual(templateId, [1, 2, 3, 4, 5, 6, 1], "det sjuende bildet får motiv 1 igjen");
+        for (const bildeId of model.viewState.newTripPage.pictures) {
+            templateIds.push(findImageById(bildeId).templateId);
+        }
+
+        assert.deepEqual(templateIds, [1, 2, 3, 4, 5, 6, 1], "det sjuende bildet får motiv 1 igjen");
     });
 });
 
