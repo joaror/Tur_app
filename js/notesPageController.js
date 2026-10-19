@@ -1,28 +1,32 @@
 function addNewNote() {
-    const noteForm = model.viewState.newNotePage;
-    const newNote = structuredClone(noteForm);
+    let noteForm = model.viewState.newNotePage;
     const notes = model.data.notes;
 
-    let newId = 0;
-    const date = new Date();
+    noteForm.noteId = getNextId(notes);
+    noteForm.date = noteForm.date
+    noteForm.updatedAt = getTimestamp();
+    
+    notes.push(noteForm);
 
-    for (let note of notes) {
-        if (newId <= note.id) newId = note.id + 1;
+    model.viewState.newNotePage = {
+      title: "",
+      date: "",
+      description: "",
+      topics: [],
     }
 
-    newNote.id = newId;
-    newNote.date = date.toLocaleDateString();
-    newNote.updatedAt = date.toLocaleString();
+    goToPage('notesPage');
+}
 
-    noteForm.description = "";
-    noteForm.title = "";
-    noteForm.topics = [];
+function checkFormComplete(params) {
+    const form  = model.viewState.newNotePage 
 
-    notes.push(newNote);
+    if (form.title == '' 
+        || form.date == '' 
+        || form.description == '' 
+        || form.topics.length <= 0) {
+            alert('fullfør') 
+    }  else {
 
-
-    //Når kjører updateView() ? I goToPage() !!Bruk goToPage()!!
-              updateViewNotesPage();
-
-    
+    }
 }
