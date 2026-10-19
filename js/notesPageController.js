@@ -19,4 +19,10 @@ function addNewNote() {
     noteForm.topics = [];
 
     notes.push(newNote);
+
+
+    //Når kjører updateView() ? I goToPage() !!Bruk goToPage()!!
+              updateViewNotesPage();
+
+    
 }
