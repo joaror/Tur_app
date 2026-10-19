@@ -24,6 +24,7 @@ const model = {
       description: "",
       pictures: [],
       errorMessage: "",
+      updatedAt: "",
     },
 
     editTripPage: {
@@ -36,6 +37,7 @@ const model = {
       description: "",
       pictures: [],
       errorMessage: "",
+      updatedAt: "",
     },
 
     // Turliste

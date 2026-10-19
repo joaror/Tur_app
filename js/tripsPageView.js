@@ -512,6 +512,7 @@ function createTripNotesSectionHtml(trip) {
     }
   }
 
+  html += `<p class="notes-text">Sist endret: ${trip.updatedAt}</p>`;
   html += "</div>";
 
   return html;
