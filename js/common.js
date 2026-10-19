@@ -80,7 +80,14 @@ function createFloatingActionHtml(onclick, title) {
     `;
 }
 
-/* --- Hjelpefunksjoner ----------------------------------------------------- */
+function goToPage(page) {
+  if (model.app.currentPage === page) {
+    return;
+  }
+
+  model.app.currentPage = page;
+  updateView();
+}
 
 /* Finner et objekt i en liste på id. Vi bruker alltid id, aldri
    plasseringen i arrayen, som identitet. */
@@ -164,46 +171,46 @@ function createPreview(text) {
 /* Neste ledige id i en liste. Vi bruker den når vi lager nye
    turer og notater, slik at id-ene fortsetter etter der de slutter. */
 function getNextId(array) {
-    let biggestId = 0;
+  let biggestId = 0;
 
-    for (const object of array) {
-        if (object.id > biggestId) {
-            biggestId = object.id;
-        }
+  for (const object of array) {
+    if (object.id > biggestId) {
+      biggestId = object.id;
     }
+  }
 
-    return biggestId + 1;
+  return biggestId + 1;
 }
 
 /* Sesongen regnes ut fra datoen, den lagres ikke på turen.
    Mars–mai er vår, juni–august er sommer, september–november er høst,
    desember–februar er vinter. */
 function getSeasonName(dateText) {
-    if (!dateText) {
-        return "";
-    }
+  if (!dateText) {
+    return "";
+  }
 
-    const date = new Date(dateText);
-    const month = date.getMonth();
+  const date = new Date(dateText);
+  const month = date.getMonth();
 
-    if (month >= 2 && month <= 4) {
-        return "Vår";
-    }
+  if (month >= 2 && month <= 4) {
+    return "Vår";
+  }
 
-    if (month >= 5 && month <= 7) {
-        return "Sommer";
-    }
+  if (month >= 5 && month <= 7) {
+    return "Sommer";
+  }
 
-    if (month >= 8 && month <= 10) {
-        return "Høst";
-    }
+  if (month >= 8 && month <= 10) {
+    return "Høst";
+  }
 
-    return "Vinter";
+  return "Vinter";
 }
 /* Tilbakeknappen i toppteksten. Den bruker goToPage() i controlleren. */
-function createBackButtonHtml() {
-    return /*HTML*/ `
-        <a class="back-btn" onclick="goToPage('tripsPage');" href="#" title="Tilbake">
+function createBackButtonHtml(page) {
+  return /*HTML*/ `
+        <a class="back-btn" onclick="goToPage('${page}');" href="#" title="Tilbake">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
