@@ -19,19 +19,20 @@ function updateViewNotesPage() {
     `;
 }
 
-// Denne må du se mer på Joakim ++ Funker til notater. 
 // Kan det være noe mer i common? Se på senere.
 // Topics må i newnote i viewstates. se mer på dette.
-
-// 
 
 function getTags(tags, styletag, modelobject) {
     let html = "";
     for (let tag of tags) {
-        console.log(tag)
         html += /* HTML */ `
-            <span class="${styletag}" 
-                >${modelobject ? findObjectById(modelobject, tag).topic : tag.topic}
+            <span class=${styletag} 
+                ${modelobject 
+                    ? '' 
+                    :  /* HTML */ `onclick="model.viewState.newNotePage.topics.push(${tag.id})"`}>
+                ${modelobject 
+                    ? findObjectById(modelobject, tag).topic 
+                    : tag.topic}
             </span>
         `;
     }
@@ -43,10 +44,11 @@ function getNotes() {
     let html = "";
 
     for (let note of data.notes) {
+        console.log(note.date)
         html += /* HTML */ `
             <a class="note-card" href="notat-detaljer.html">
                 <div class="note-card-header">
-                    <span class="note-date">${note.date}</span>
+                    <span class="note-date">${formatDate(note.date)}</span>
                 </div>
                 <h2>${note.title}</h2>
                 <p>${note.description}</p>
@@ -59,25 +61,12 @@ function getNotes() {
     return html;
 }
 
-// prototype rest 45 117
-// plussen funker ikke, lnje 16
+// prototype rest 45 - notat-detaljer.html.
+// Detaljvisning av enkeltnotat. Ikke implementert.
+// prototype rest117
 
-// topics knapper...
+// Implementer 
 
-
-// .form-body {
-//   flex: 1;
-//   overflow-y: auto;
-//   padding: 20px;  ++++
-//   display: flex;
-//   flex-direction: column;
-//   gap: 20px;
-// }
-
-// Fjerna padding 20px fra css for riktig plassering av skjemaet. +
-// Må ha hjelpe funsksjon for mating av skjemafeltene til modell?
-// Endra emneknaggenes htmltag fra div til span siden disse tegnes opp inline. +
-// Legg til emneknagger må ordnes. Knapper? må ha id fra modell.
 
 function updateViewEditNotesPage() {
     const html = /*HTML*/ `
@@ -85,7 +74,8 @@ function updateViewEditNotesPage() {
             <div class="phone-frame">
                 ${createStatusBarHtml()}
                 
-                <header class="app-header">
+                <header class="app-header app-header--actions">
+                    ${createBackButtonHtml("notesPage")}
                     <h1>Nytt notat</h1>
                 </header>
                 
@@ -93,7 +83,9 @@ function updateViewEditNotesPage() {
                     <div class="form-body">
                         <div class="field">
                             <label>Tittel</label>
-                            <input type="text" onchange="model.viewState.newNotePage.title = this.value" placeholder="f.eks. Sesongplanlegging vinter 2027" />
+                            <input type="text" 
+                                onchange="model.viewState.newNotePage.title = this.value" 
+                                placeholder="f.eks. Sesongplanlegging vinter 2027" />
                         </div>
                         <div class="field">
                             <label>Dato</label>
@@ -102,9 +94,22 @@ function updateViewEditNotesPage() {
                         <div class="field">
                             <label for="notat">Notat</label>
                             <div class="textarea-wrap">
-                                <textarea id="notat" onchange="model.viewState.newNotePage.description = this.value" placeholder="Skriv dine tanker, refleksjoner eller planer her..."></textarea>
+                                <textarea id="notat" 
+                                        onchange="model.viewState.newNotePage.description = this.value" 
+                                        placeholder="Skriv dine tanker, refleksjoner eller planer her...">
+                                </textarea>
                                 <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                                    <svg viewBox="0 0 24 24"
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        stroke-width="2" 
+                                        stroke-linecap="round" 
+                                        stroke-linejoin="round">
+                                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                        <line x1="12" y1="19" x2="12" y2="23"/>
+                                        <line x1="8" y1="23" x2="16" y2="23"/>
+                                    </svg>
                                 </button>
                             </div>
                             <p class="mic-status" id="micStatus" hidden></p>
@@ -118,10 +123,11 @@ function updateViewEditNotesPage() {
                             </main>
                             
                             <div class="action-bar">
-                                <button class="btn btn-secondary" onclick="location.href='tur-logg.html'">Avbryt</button>
+                                <button class="btn btn-secondary" onclick="goToPage('notesPage')">Avbryt</button>
                                 <button class="btn btn-primary" onclick="addNewNote()">Lagre</button>
                             </div>
                         </div>
+
                     </div>
                 `;
 
