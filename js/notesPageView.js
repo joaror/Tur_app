@@ -1,22 +1,73 @@
 function updateViewNotesPage() {
-    document.getElementById("app").innerHTML = /*HTML*/ `
-        <div class="page-notes" style="display: flex; justify-content: center;">
+    const html = /*HTML*/ `
+    <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
                 ${createStatusBarHtml()}
                 
-                    <header class="app-header">
-                        <h1>Notater</h1>
-                    </header>
+                ${createHeader(model.app.currentPage)}
                     
-                <main class="content">
-                    ${getNotes()}
-                </main>
+                ${createMainContent(model.app.currentPage)}
 
-                ${createBottomNavHtml("notesPage")}
-                ${createFloatingActionHtml("goToPage('editNotePage');", "Nytt notat")}
+                ${createFooter(model.app.currentPage)}
             </div>
         </div>
     `;
+    document.getElementById('app').innerHTML = html;
+}
+
+function createHeader(page) {
+    let html = "";
+    if (page == "notesPage") {
+        html = /*HTML*/ `
+            <header class="app-header">
+                <h1>Notater</h1>
+            </header>
+        `;
+    } else if (page == "editNotePage") {
+        html = /*HTML*/ `
+            <header class="app-header app-header--actions">
+                ${createBackButtonHtml("notesPage")}
+                <h1>Nytt notat</h1>
+            </header>
+        `;
+    }
+    return html;
+}
+
+function createMainContent(page) {
+    let html = "";
+    if (page == "notesPage") {
+        html = /*HTML*/ `
+            <main class="content">
+                ${getNotes()}
+            </main>
+        `;
+    } else if (page == "editNotePage") {
+        html = /*HTML*/ `
+            <main class="content">
+                ${updateViewEditNotesPage()}
+            </main>
+        `;
+    }
+    return html;
+}
+
+function createFooter(page) {
+    let html = "";
+    if (page == "notesPage") {
+        html = /*HTML*/ `
+            ${createBottomNavHtml("notesPage")}
+            ${createFloatingActionHtml("goToPage('editNotePage');", "Nytt notat")}
+        `;
+    } else if (page == "editNotePage") {
+        html = /*HTML*/ `
+            <div class="action-bar">
+                <button class="btn btn-secondary" onclick="goToPage('notesPage')">Avbryt</button>
+                <button class="btn btn-primary" onclick="addNewNote()">Lagre</button>
+            </div>
+        `;
+    }
+    return html;
 }
 
 // Kan det være noe mer i common? Se på senere.
@@ -26,13 +77,13 @@ function getTags(tags, styletag, modelobject) {
     let html = "";
     for (let tag of tags) {
         html += /* HTML */ `
-            <span class=${styletag} 
-                ${modelobject 
-                    ? '' 
-                    :  /* HTML */ `onclick="model.viewState.newNotePage.topics.push(${tag.id})"`}>
-                ${modelobject 
-                    ? findObjectById(modelobject, tag).topic 
-                    : tag.topic}
+            <span
+                class=${styletag}
+                ${modelobject
+                    ? ""
+                    : /* HTML */ `onclick="model.viewState.newNotePage.topics.push(${tag.id})"`}
+            >
+                ${modelobject ? findObjectById(modelobject, tag).topic : tag.topic}
             </span>
         `;
     }
@@ -44,7 +95,7 @@ function getNotes() {
     let html = "";
 
     for (let note of data.notes) {
-        console.log(note.date)
+        console.log(note.date);
         html += /* HTML */ `
             <a class="note-card" href="notat-detaljer.html">
                 <div class="note-card-header">
@@ -65,73 +116,56 @@ function getNotes() {
 // Detaljvisning av enkeltnotat. Ikke implementert.
 // prototype rest117
 
-// Implementer 
-
+// Implementer
 
 function updateViewEditNotesPage() {
     const html = /*HTML*/ `
-        <div class="page-notes" style="display: flex; justify-content: center;">
-            <div class="phone-frame">
-                ${createStatusBarHtml()}
+        <div class="form-body">
+            <div class="field">
+                <label>Tittel</label>
+                <input type="text" 
+                    onchange="model.viewState.newNotePage.title = this.value" 
+                    placeholder="f.eks. Sesongplanlegging vinter 2027" />
+            </div>
+            <div class="field">
+                <label>Dato</label>
+                <input type="date" onchange="model.viewState.newNotePage.date = this.value"/>
+            </div>
+            <div class="field">
+                <label for="notat">Notat</label>
+                <div class="textarea-wrap">
+                    <textarea id="notat" 
+                            onchange="model.viewState.newNotePage.description = this.value" 
+                            placeholder="Skriv dine tanker, refleksjoner eller planer her...">
+                    </textarea>
+                    <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
+                        <svg viewBox="0 0 24 24"
+                            fill="none" 
+                            stroke="currentColor" 
+                            stroke-width="2" 
+                            stroke-linecap="round" 
+                            stroke-linejoin="round">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                    </button>
+                </div>
                 
-                <header class="app-header app-header--actions">
-                    ${createBackButtonHtml("notesPage")}
-                    <h1>Nytt notat</h1>
-                </header>
-                
-                <main class="content">
-                    <div class="form-body">
-                        <div class="field">
-                            <label>Tittel</label>
-                            <input type="text" 
-                                onchange="model.viewState.newNotePage.title = this.value" 
-                                placeholder="f.eks. Sesongplanlegging vinter 2027" />
-                        </div>
-                        <div class="field">
-                            <label>Dato</label>
-                            <input type="date" onchange="model.viewState.newNotePage.date = this.value"/>
-                        </div>
-                        <div class="field">
-                            <label for="notat">Notat</label>
-                            <div class="textarea-wrap">
-                                <textarea id="notat" 
-                                        onchange="model.viewState.newNotePage.description = this.value" 
-                                        placeholder="Skriv dine tanker, refleksjoner eller planer her...">
-                                </textarea>
-                                <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
-                                    <svg viewBox="0 0 24 24"
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        stroke-width="2" 
-                                        stroke-linecap="round" 
-                                        stroke-linejoin="round">
-                                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                                        <line x1="12" y1="19" x2="12" y2="23"/>
-                                        <line x1="8" y1="23" x2="16" y2="23"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <p class="mic-status" id="micStatus" hidden></p>
-                        </div>
+                <p class="mic-status" id="micStatus" hidden></p>
+            </div>
 
-                        <div class="tags-field">
-                            <label>Emneknagger</label>
-                            <div class="tag-chips">
-                                ${getTags(model.data.topics, "chip")}
-                            </div>
-                            </main>
-                            
-                            <div class="action-bar">
-                                <button class="btn btn-secondary" onclick="goToPage('notesPage')">Avbryt</button>
-                                <button class="btn btn-primary" onclick="addNewNote()">Lagre</button>
-                            </div>
-                        </div>
-
-                    </div>
+            <div class="tags-field">
+                <label>Emneknagger</label>
+                <div class="tag-chips">
+                    ${getTags(model.data.topics, "chip")}
+                </div>
+            </div>
+        </div>
                 `;
 
-    document.getElementById("app").innerHTML = html;
+    return html;
 
     //   ${createBottomNavHtml("notesPage")}
 }
