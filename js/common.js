@@ -207,16 +207,22 @@ function getSeasonName(dateText) {
 
   return "Vinter";
 }
-/* Tilbakeknappen i toppteksten. Den bruker goToPage() i controlleren. */
-function createBackButtonHtml(page) {
+
+/* Tilbakeknappen i toppteksten. Den bruker goToPage() i controlleren.
+   Skal vi gå tilbake til et skjema i stedet, kan vi sende inn en egen
+   onclick, for eksempel "cancelEditTripForm();". */
+function createBackButtonHtml(page, onclick) {
+  const click = onclick ? onclick : `goToPage('${page}');`;
+
   return /*HTML*/ `
-        <a class="back-btn" onclick="goToPage('${page}');" href="#" title="Tilbake">
+        <a class="back-btn" onclick="${click}" href="#" title="Tilbake">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
         </a>
     `;
 }
+
 /* Tidspunkt brukt på nye og endrede turer, på samme format
    som updatedAt i modellen: 2026-10-06T19:24 */
 function getTimestamp() {
@@ -248,8 +254,8 @@ function createPictureSvgHtml(imageId) {
   return template.svg;
 }
 
-/* Navnet på bildet. Hvis det ikke er satt, bruker vi navnet
-   på motivet. */
+/* Navnet på bildet. Det er motivet i model.data.imageTemplates som
+   gir navnet, så bildet selv trenger ikke å lagre et eget navn. */
 function getPictureLabel(imageId) {
   const image = findObjectById(model.data.images, imageId);
 
@@ -263,5 +269,5 @@ function getPictureLabel(imageId) {
     return template.label;
   }
 
-  return image.label ? image.label : "Bilde";
+  return "Bilde";
 }

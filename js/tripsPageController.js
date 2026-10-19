@@ -31,6 +31,7 @@ function openTrip(tripId) {
 }
 
 function startNewTrip() {
+  deleteUnsavedPictures(model.viewState.newTripPage);
   clearTripForm(model.viewState.newTripPage);
 
   model.app.currentPage = "newTripPage";
@@ -83,13 +84,15 @@ function confirmDeleteTrip() {
     return;
   }
 
-  deleteImagesForTrip(trip);
-
+  /* Turen tas bort før bildene slettes. Da ser vi ikke lenger turen
+     når vi sjekker om et bilde brukes av noen annen tur. */
   const index = findIndexById(model.data.trips, trip.id);
 
   if (index !== -1) {
     model.data.trips.splice(index, 1);
   }
+
+  deleteImagesForTrip(trip);
 
   tripView.tripId = null;
   tripView.pageNumber = 0;
@@ -118,8 +121,7 @@ function duplicateTrip() {
     date: trip.date,
     countyId: trip.countyId,
     description: trip.description,
-    pictures: duplicateImagesForTrip(newTripId, trip),
-    updatedAt: trip.updatedAt,
+    pictures: duplicateImagesForTrip(trip),
   };
 
   model.data.trips.push(newTrip);
@@ -138,8 +140,7 @@ function editTrip(tripId) {
     return;
   }
 
-  /* Skjemaet er et arbeidsutkast, så vi fyller det med
-       verdiene fra turen, ikke med turen selv. */
+  /* Skjemaet er et arbeidsutkast, så vi fyller det med verdiene fra turen, ikke med turen selv. */
   const editTripPage = model.viewState.editTripPage;
 
   editTripPage.tripId = trip.id;
@@ -231,12 +232,13 @@ function saveNewTrip() {
     date: form.date,
     countyId: form.countyId,
     description: form.description,
-    pictures: form.pictures.slice(),
-    updatedAt: getTimestamp(),
+    pictures: [],
   };
 
-  linkPicturesToTrip(form.pictures, newTripId);
   model.data.trips.push(newTrip);
+
+  /* Turen må finnes i modellen før bildene kan knyttes til den. */
+  linkPicturesToTrip(form.pictures, newTrip.id);
 
   clearTripForm(model.viewState.newTripPage);
 
@@ -275,9 +277,9 @@ function saveEditedTrip() {
   trip.date = form.date;
   trip.countyId = form.countyId;
   trip.description = form.description;
-  trip.pictures = form.pictures.slice();
-  trip.updatedAt = getTimestamp();
 
+  /* Turens pictures-liste følger skjemaet, og bilder som ble fjernet
+     fra skjemaet, blir slettet. */
   linkPicturesToTrip(form.pictures, trip.id);
 
   clearTripForm(model.viewState.editTripPage);
@@ -357,15 +359,13 @@ function clearTripForm(form) {
   form.errorMessage = "";
 }
 
-/* Legger til et bilde i skjemaet. Vi lager et bildeobjekt med
-   tripId = null, som betyr at det ikke hører til en tur ennå. */
+/* Legger til et bilde i skjemaet. Bildet ligger i model.data.images,
+   men det står ikke i noen tur sin pictures-liste ennå. */
 function addPictureToForm(form) {
   const pictureId = getNextId(model.data.images);
 
   model.data.images.push({
     id: pictureId,
-    tripId: null,
-    label: "Bilde",
     templateId: getNextTemplateId(form.pictures.length),
   });
 
@@ -379,7 +379,7 @@ function getNextTemplateId(pictureCount) {
   return templates[pictureCount % templates.length].id;
 }
 
-/* Fjerner ett bilde fra skjemaet. Et bilde som aldri har blitt lagret på en tur, 
+/* Fjerner ett bilde fra skjemaet. Et bilde som ikke hører til noen tur,
    slettes også, slik at vi ikke lar ubrukte bilder ligge i modellen. */
 function removePictureFromForm(form, pictureId) {
   const index = form.pictures.indexOf(pictureId);
@@ -388,33 +388,31 @@ function removePictureFromForm(form, pictureId) {
     form.pictures.splice(index, 1);
   }
 
-  const image = findObjectById(model.data.images, pictureId);
-
-  if (image && image.tripId === null) {
-    const imageIndex = findIndexById(model.data.images, pictureId);
-
-    if (imageIndex !== -1) {
-      model.data.images.splice(imageIndex, 1);
-    }
+  if (!isImageUsedByTrip(pictureId)) {
+    removeImageById(pictureId);
   }
 }
 
-/* Knytter bildene i skjemaet til turen, og sletter bilder som hører til turen, 
-   men som ikke er med i skjemaet lenger. */
+/* Knytter bildene i skjemaet til turen, og sletter bilder som hørte til
+   turen, men som ikke er med i skjemaet lenger. */
 function linkPicturesToTrip(pictureIds, tripId) {
-  for (const pictureId of pictureIds) {
-    const image = findObjectById(model.data.images, pictureId);
+  const trip = findObjectById(model.data.trips, tripId);
 
-    if (image) {
-      image.tripId = tripId;
-    }
+  if (!trip) {
+    return;
   }
 
-  for (let i = model.data.images.length - 1; i >= 0; i--) {
-    const image = model.data.images[i];
+  const oldPictureIds = trip.pictures.slice();
 
-    if (image.tripId === tripId && !pictureIds.includes(image.id)) {
-      model.data.images.splice(i, 1);
+  trip.pictures = pictureIds.slice();
+
+  for (const pictureId of oldPictureIds) {
+    if (pictureIds.includes(pictureId)) {
+      continue;
+    }
+
+    if (!isImageUsedByTrip(pictureId)) {
+      removeImageById(pictureId);
     }
   }
 }
@@ -423,26 +421,19 @@ function linkPicturesToTrip(pictureIds, tripId) {
    ble lagret. Kalles når brukeren avbryter. */
 function deleteUnsavedPictures(form) {
   for (const pictureId of form.pictures) {
-    const image = findObjectById(model.data.images, pictureId);
-
-    if (image && image.tripId === null) {
-      const imageIndex = findIndexById(model.data.images, pictureId);
-
-      if (imageIndex !== -1) {
-        model.data.images.splice(imageIndex, 1);
-      }
+    if (!isImageUsedByTrip(pictureId)) {
+      removeImageById(pictureId);
     }
   }
 }
 
-/* Sletter bildene som hører til en tur. Vi ser både etter bilder som
-   peker på turen, og etter bildene som står i turens pictures-liste. */
+/* Sletter bildene som hører til en tur. Turen skal være fjernet fra
+   modellen først, slik at vi ikke teller turen selv. Et bilde som også
+   brukes av en annen tur, blir beholdt. */
 function deleteImagesForTrip(trip) {
-  for (let i = model.data.images.length - 1; i >= 0; i--) {
-    const image = model.data.images[i];
-
-    if (image.tripId === trip.id || trip.pictures.includes(image.id)) {
-      model.data.images.splice(i, 1);
+  for (const pictureId of trip.pictures) {
+    if (!isImageUsedByTrip(pictureId)) {
+      removeImageById(pictureId);
     }
   }
 }
@@ -450,7 +441,7 @@ function deleteImagesForTrip(trip) {
 /* Lager nye bildeobjekter for kopien, og gir turen de nye id-ene.
    Bildene kopieres ikke, slik at originalen og kopien kan endres
    hver for seg. */
-function duplicateImagesForTrip(newTripId, trip) {
+function duplicateImagesForTrip(trip) {
   const pictureIds = [];
 
   for (const pictureId of trip.pictures) {
@@ -462,8 +453,6 @@ function duplicateImagesForTrip(newTripId, trip) {
 
     const newImage = {
       id: getNextId(model.data.images),
-      tripId: newTripId,
-      label: image.label,
       templateId: image.templateId,
     };
 
@@ -472,4 +461,26 @@ function duplicateImagesForTrip(newTripId, trip) {
   }
 
   return pictureIds;
+}
+
+/* Sjekker om et bilde hører til noen tur. Bildene på en tur står
+   i turens pictures-liste, så det er den som sier hvem som hører
+   til hverandre. */
+function isImageUsedByTrip(pictureId) {
+  for (const trip of model.data.trips) {
+    if (trip.pictures.includes(pictureId)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/* Sletter ett bilde fra model.data.images. */
+function removeImageById(pictureId) {
+  const index = findIndexById(model.data.images, pictureId);
+
+  if (index !== -1) {
+    model.data.images.splice(index, 1);
+  }
 }

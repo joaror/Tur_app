@@ -119,6 +119,8 @@ const model = {
       { id: 4, season: "Vinter" },
       { id: 5, season: "Alle" },
     ],
+    // Turene. Bildene ligger i pictures-listen, og peker på bilder i
+    // model.data.images. Det er den eneste koblingen mellom tur og bilde.
     trips: [
       {
         id: 1,
@@ -127,7 +129,7 @@ const model = {
         location: "Hammervatnet",
         date: "2026-10-30",
         countyId: 5,
-        pictures: [],
+        pictures: [1, 2, 3],
         description: "",
         updatedAt: "2026-10-06T19:24",
       },
@@ -138,7 +140,7 @@ const model = {
         location: "Fjellheia",
         date: "2026-10-01",
         countyId: 5,
-        pictures: [1, 2, 4, 5],
+        pictures: [4, 5],
         description:
           "Klassisk tur til heia. Pent vær men ganske mange folk. God sikt ned til fjordarmen og klare farger i løvfellet.",
         updatedAt: "2026-10-01T19:24",
@@ -150,7 +152,7 @@ const model = {
         location: "Holtet",
         date: "2026-08-15",
         countyId: 1,
-        pictures: [1, 4],
+        pictures: [6],
         description:
           "Bærtur i skogen. På vei tilbake tok vi en pause ved vannet og spiste niste. Kom tilbake til bilen ved 16-tiden. Definitivt verdt turen!",
         updatedAt: "2026-01-05T19:24",
@@ -162,7 +164,7 @@ const model = {
         location: "Lyngsalpan",
         date: "2026-01-04",
         countyId: 4,
-        pictures: [1, 2, 4, 5, 6],
+        pictures: [7, 8, 9, 10, 11],
         description:
           "Fantastisk tur i høstsnø! Startet fra bommen ved 8-tiden og hadde strålende vær hele dagen. God sikt ned til fjordarmen og klare farger i løvfellet. Ingen problemer med snøforholdene - godt preparerte spor i store deler av turen. På vei ned tok vi en pause ved vannet og spiste niste. Kom tilbake til bilen ved 16-tiden. Definitivt verdt turen!",
         updatedAt: "2026-01-05T19:24",
@@ -180,13 +182,20 @@ const model = {
       },
     ],
 
+    // Bildene. Hvert bilde peker på et motiv i model.data.imageTemplates.
+    // Hvilken tur et bilde hører til, står i turens pictures-liste.
     images: [
-      { id: 1, tripId: 1, label: "Bilde 1", templateId: 1 },
-      { id: 2, tripId: 1, label: "Bilde 2", templateId: 2 },
-      { id: 3, tripId: 1, label: "Bilde 3", templateId: 3 },
-      { id: 4, tripId: 2, label: "Bilde 4", templateId: 4 },
-      { id: 5, tripId: 2, label: "Bilde 5", templateId: 5 },
-      { id: 6, tripId: 2, label: "Bilde 6", templateId: 6 },
+      { id: 1, templateId: 1 },
+      { id: 2, templateId: 2 },
+      { id: 3, templateId: 3 },
+      { id: 4, templateId: 4 },
+      { id: 5, templateId: 5 },
+      { id: 6, templateId: 6 },
+      { id: 7, templateId: 1 },
+      { id: 8, templateId: 2 },
+      { id: 9, templateId: 3 },
+      { id: 10, templateId: 4 },
+      { id: 11, templateId: 5 },
     ],
 
     // Ferdige bilder vi kan bruke i stedet for å laste opp filer. Hvert motiv er en inline-SVG, så ingenting lagres til disk.
