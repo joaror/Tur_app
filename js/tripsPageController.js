@@ -37,15 +37,6 @@ function startNewTrip() {
   updateView();
 }
 
-function goToPage(page) {
-  if (model.app.currentPage === page) {
-    return;
-  }
-
-  model.app.currentPage = page;
-  updateView();
-}
-
 /* ==========================================================================
    Turdetaljer
 

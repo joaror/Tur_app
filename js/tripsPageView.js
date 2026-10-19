@@ -201,7 +201,7 @@ function updateViewTripViewPage() {
                 ${createStatusBarHtml()}
 
                 <header class="app-header app-header--actions">
-                    ${createBackButtonHtml()}
+                    ${createBackButtonHtml("tripsPage")}
                     <h1>Turdetaljer</h1>
                 </header>
 
@@ -226,7 +226,7 @@ function updateViewTripViewPage() {
                 ${createStatusBarHtml()}
 
                 <header class="app-header app-header--actions">
-                    ${createBackButtonHtml()}
+                    ${createBackButtonHtml("tripsPage")}
                     <h1>Turdetaljer</h1>
                     <div class="header-actions">
                         <button class="icon-btn" type="button" title="Rediger" onclick="editTrip(${trip.id});">
@@ -502,7 +502,7 @@ function updateViewTripForm(form, pageName, isEdit) {
                 ${createStatusBarHtml()}
 
                 <header class="app-header app-header--actions">
-                    ${createBackButtonHtml()}
+                    ${createBackButtonHtml("tripsPage")}
                     <h1>${heading}</h1>
                 </header>
 
