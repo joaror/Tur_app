@@ -1,18 +1,263 @@
 function updateViewNotesPage() {
     const html = /*HTML*/ `
-    <div class="page-notes" style="display: flex; justify-content: center;">
+        <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
                 ${createStatusBarHtml()}
                 
-                ${createHeader(model.app.currentPage)}
-                    
-                ${createMainContent(model.app.currentPage)}
+                <header class="app-header">
+                    <h1>Notater</h1>
+                </header>                    
+
+                ${createMainContent(model.app.currentPage)} 
 
                 ${createFooter(model.app.currentPage)}
             </div>
         </div>
     `;
-    document.getElementById('app').innerHTML = html;
+    document.getElementById("app").innerHTML = html;
+}
+
+function updateViewEditNotesPage() {
+    const html = /*HTML*/ `
+        <div class="page-notes" style="display: flex; justify-content: center;">
+            <div class="phone-frame">
+                ${createStatusBarHtml()}
+                
+                <header class="app-header app-header--actions">
+                    ${createBackButtonHtml("notesPage")}
+                    <h1>Nytt notat</h1>
+                </header>
+
+                <main class="content">
+                    <div class="form-body">
+                        <div class="field">
+                            <label>Tittel</label>
+                            <input type="text" 
+                                onchange="model.viewState.newNotePage.title = this.value" 
+                                placeholder="f.eks. Sesongplanlegging vinter 2027" />
+                        </div>
+
+                        <div class="field">
+                            <label>Dato</label>
+                            <input type="date" onchange="model.viewState.newNotePage.date = this.value"/>
+                        </div>
+                    
+                        <div class="field">
+                            <label for="notat">Notat</label>
+                            <div class="textarea-wrap">
+                                <textarea id="notat" 
+                                        onchange="model.viewState.newNotePage.description = this.value" 
+                                        placeholder="Skriv dine tanker, refleksjoner eller planer her...">
+                                </textarea>
+                                <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
+                                    <svg viewBox="0 0 24 24"
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        stroke-width="2" 
+                                        stroke-linecap="round" 
+                                        stroke-linejoin="round">
+                                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                        <line x1="12" y1="19" x2="12" y2="23"/>
+                                        <line x1="8" y1="23" x2="16" y2="23"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="mic-status" id="micStatus" hidden></p>
+                        </div>
+
+                        <div class="tags-field">
+                            <label>Emneknagger</label>
+                            <div class="tag-chips">
+                                ${getTags(model.data.topics, "chip")}
+                            </div>
+                        </div>
+                    </div>
+                </main>
+                
+                <div class="action-bar">
+                    <button class="btn btn-secondary" onclick="goToPage('notesPage')">Avbryt</button>
+                    <button class="btn btn-primary" onclick="addNewNote()">Lagre</button>
+                </div>
+                
+            </div>
+        </div>
+
+    `;
+    document.getElementById("app").innerHTML = html;
+}
+
+function updateViewNoteViewPage(noteId) {
+    console.log(noteId);
+    const html = /*HTML*/ `
+        <div class="page-notes" style="display: flex; justify-content: center;">
+            <div class="phone-frame">
+                ${createStatusBarHtml()}
+                
+                <header class="app-header app-header--actions">
+                    ${createBackButtonHtml("notesPage")}
+                    <h1>Nytt notat</h1>
+                    <div class="header-actions">
+                        <button class="icon-btn" type="button" id="editBtn" title="Rediger">
+                            <svg viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                        </button>
+                        <div class="menu-wrap">
+                            <button class="icon-btn" type="button" id="moreBtn" title="Mer">
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <circle cx="12" cy="12" r="1" />
+                                <circle cx="19" cy="12" r="1" />
+                                <circle cx="5" cy="12" r="1" />
+                            </svg>
+                            </button>
+                        <div class="menu" id="moreMenu" hidden>
+                            <button class="menu-item" type="button">
+                                <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                >
+                                <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
+                                <polyline points="16 6 12 2 8 6" />
+                                <line x1="12" y1="2" x2="12" y2="15" />
+                                </svg>
+                                Del notat
+                            </button>
+                            <button class="menu-item" type="button">
+                                <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                >
+                                <rect x="9" y="9" width="13" height="13" rx="2" />
+                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                                </svg>
+                                Dupliser notat
+                            </button>
+                            <div class="menu-divider"></div>
+                            <button class="menu-item danger" type="button" id="deleteBtn">
+                                <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                >
+                                <polyline points="3 6 5 6 21 6" />
+                                <path
+                                    d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"
+                                />
+                                </svg>
+                                Slett notat
+                            </button>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                
+                <div class="detail-content" id="viewMode">
+                    <div class="detail-section">
+                        <div class="note-detail-head">
+                            <span class="meta-chip">
+                                <svg viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="16" y1="2" x2="16" y2="6" />
+                                    <line x1="8" y1="2" x2="8" y2="6" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                                 5. okt 2026
+                            </span>
+                            <span class="meta-chip">Planlegging</span>
+                        </div>
+                        <h2 id="viewTitle">Sesongplanlegging høst 2026</h2>
+                    </div>
+                    <div class="detail-section">
+                        <p class="note-detail-text" id="viewText"> </P>
+                        <div class="note-detail-tags" id="viewTags">
+                            <span class="tag">Planlegging</span>
+                            <span class="tag">Høst</span>
+                        </div>
+                        <p class="note-updated">Sist oppdatert 6. okt 2026 · 19:24</p>
+                    </div>
+                </div>
+
+      <!-- Redigeringsmodus (skjulles til pennikonappen trykkes) -->
+      <div class="form-body edit-mode" id="editMode" hidden>
+        <div class="field">
+          <label for="fTittel">Tittel</label>
+          <input type="text" id="fTittel" value="Sesongplanlegging høst 2026" />
+        </div>
+
+        <div class="field">
+          <label for="fDato">Dato</label>
+          <input type="date" id="fDato" value="2026-10-05" />
+        </div>
+
+        <div class="field">
+          <label for="fNotat">Notat</label>
+          <div class="textarea-wrap">
+            <textarea id="fNotat">Bør prioritere turer i septemberoktober før snøen legger seg i høyden. Har lyst til å prøve Nordkapp-turen igjen, kanskje kombinere med båt.
+            Måltall for høsten er tre overnattingsturer og én fisketur. Utstyret er nesten klart, men sekken må byttes før frosten setter inn.
+            Neste steg: bestill billetter og legg inn planlagte turer i appen, slik at kalenderen viser hva som allerede er booket.</textarea>
+            <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+          </div>
+          <p class="mic-status" id="micStatus" hidden></p>
+        </div>
+
+        <div class="tags-field">
+          <label>Emneknagger</label>
+          <div class="tag-chips" id="tagChips">
+            <button type="button" class="chip selected">Planlegging</button>
+            <button type="button" class="chip">Utstyr</button>
+            <button type="button" class="chip">Refleksjon</button>
+            <button type="button" class="chip">Mål</button>
+            <button type="button" class="chip">Tips</button>
+            <button type="button" class="chip">Høst</button>
+          </div>
+          <p class="unsaved-hint" id="unsavedHint" hidden>Ulagrede endringer</p>
+        </div>
+      </div>
+
+      <div class="action-bar" id="actionBar" hidden>
+        <button class="btn btn-secondary" type="button" id="cancelEdit">Avbryt</button>
+        <button class="btn btn-primary" type="button" id="saveEdit">Lagre</button>
+      </div>
+
+      <div class="dialog-backdrop" id="deleteDialog" hidden>
+        <div class="dialog">
+          <h2 class="dialog-title">Slette notatet?</h2>
+          <p class="dialog-text">
+            «Sesongplanlegging høst 2026» blir permanent slettet. Dette kan ikke
+            angres.
+          </p>
+          <div class="dialog-actions">
+            <button class="dialog-btn" type="button" id="cancelDelete">
+              Avbryt
+            </button>
+            <button class="dialog-btn danger" type="button" id="confirmDelete">
+              Slett notat
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById("app").innerHTML = html;
 }
 
 function createHeader(page) {
@@ -30,6 +275,8 @@ function createHeader(page) {
                 <h1>Nytt notat</h1>
             </header>
         `;
+    } else if (page == "noteViewPage") {
+        html /*HTML*/ ``;
     }
     return html;
 }
@@ -46,6 +293,12 @@ function createMainContent(page) {
         html = /*HTML*/ `
             <main class="content">
                 ${updateViewEditNotesPage()}
+            </main>
+        `;
+    } else if (page == "noteViewPage") {
+        html = /*HTML*/ `
+            <main class="content">
+                ${updateViewNoteViewPage()}
             </main>
         `;
     }
@@ -70,9 +323,6 @@ function createFooter(page) {
     return html;
 }
 
-// Kan det være noe mer i common? Se på senere.
-// Topics må i newnote i viewstates. se mer på dette.
-
 function getTags(tags, styletag, modelobject) {
     let html = "";
     for (let tag of tags) {
@@ -81,7 +331,7 @@ function getTags(tags, styletag, modelobject) {
                 class=${styletag}
                 ${modelobject
                     ? ""
-                    : /* HTML */ `onclick="model.viewState.newNotePage.topics.push(${tag.id})"`}
+                    : /* HTML */ ` onclick="model.viewState.newNotePage.topics.push(${tag.id})"`}
             >
                 ${modelobject ? findObjectById(modelobject, tag).topic : tag.topic}
             </span>
@@ -95,9 +345,8 @@ function getNotes() {
     let html = "";
 
     for (let note of data.notes) {
-        console.log(note.date);
         html += /* HTML */ `
-            <a class="note-card" href="notat-detaljer.html">
+            <div class="note-card" onclick="updateViewNoteViewPage(${note.id})">
                 <div class="note-card-header">
                     <span class="note-date">${formatDate(note.date)}</span>
                 </div>
@@ -106,7 +355,7 @@ function getNotes() {
                 <div class="tags">
                     ${getTags(findObjectById(data.notes, note.id).topics, "tag", data.topics)}
                 </div>
-            </a>
+            </div>
         `;
     }
     return html;
@@ -116,56 +365,7 @@ function getNotes() {
 // Detaljvisning av enkeltnotat. Ikke implementert.
 // prototype rest117
 
-// Implementer
-
-function updateViewEditNotesPage() {
-    const html = /*HTML*/ `
-        <div class="form-body">
-            <div class="field">
-                <label>Tittel</label>
-                <input type="text" 
-                    onchange="model.viewState.newNotePage.title = this.value" 
-                    placeholder="f.eks. Sesongplanlegging vinter 2027" />
-            </div>
-            <div class="field">
-                <label>Dato</label>
-                <input type="date" onchange="model.viewState.newNotePage.date = this.value"/>
-            </div>
-            <div class="field">
-                <label for="notat">Notat</label>
-                <div class="textarea-wrap">
-                    <textarea id="notat" 
-                            onchange="model.viewState.newNotePage.description = this.value" 
-                            placeholder="Skriv dine tanker, refleksjoner eller planer her...">
-                    </textarea>
-                    <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
-                        <svg viewBox="0 0 24 24"
-                            fill="none" 
-                            stroke="currentColor" 
-                            stroke-width="2" 
-                            stroke-linecap="round" 
-                            stroke-linejoin="round">
-                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                            <line x1="12" y1="19" x2="12" y2="23"/>
-                            <line x1="8" y1="23" x2="16" y2="23"/>
-                        </svg>
-                    </button>
-                </div>
-                
-                <p class="mic-status" id="micStatus" hidden></p>
-            </div>
-
-            <div class="tags-field">
-                <label>Emneknagger</label>
-                <div class="tag-chips">
-                    ${getTags(model.data.topics, "chip")}
-                </div>
-            </div>
-        </div>
-                `;
-
-    return html;
-
-    //   ${createBottomNavHtml("notesPage")}
-}
+// updateViewNotesPage()
+// updateViewNoteViewPage()
+// updateViewEditNotesPage()
+//
