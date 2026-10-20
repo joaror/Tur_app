@@ -508,7 +508,16 @@ function createTripNotesSectionHtml(trip) {
     }
   }
 
-  html += `<p class="notes-text">Sist endret: ${trip.updatedAt}</p>`;
+  const dateString = trip.updatedAt;
+  const date = new Date(dateString);
+
+  const formattedDate = date.toLocaleDateString("nb-NO", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  html += `<p class="notes-text">Sist endret: ${formattedDate}</p>`;
   html += "</div>";
 
   return html;
