@@ -3,30 +3,41 @@ function addNewNote() {
     const notes = model.data.notes;
 
     noteForm.noteId = getNextId(notes);
-    noteForm.date = noteForm.date
+    noteForm.date = noteForm.date;
     noteForm.updatedAt = getTimestamp();
-    
+
     notes.push(noteForm);
 
     model.viewState.newNotePage = {
-      title: "",
-      date: "",
-      description: "",
-      topics: [],
-    }
+        title: "",
+        date: "",
+        description: "",
+        topics: [],
+    };
 
-    goToPage('notesPage');
+    goToPage("notesPage");
 }
 
 function checkFormComplete(params) {
-    const form  = model.viewState.newNotePage 
+    const form = model.viewState.newNotePage;
 
-    if (form.title == '' 
-        || form.date == '' 
-        || form.description == '' 
-        || form.topics.length <= 0) {
-            alert('fullfør') 
-    }  else {
-
+    if (form.title == "" || form.date == "" || form.description == "" || form.topics.length <= 0) {
+        alert("fullfør");
+    } else {
     }
 }
+
+function openNote(noteId) {
+    const note = findObjectById(model.data.notes, noteId);
+
+    if (!note) return;
+
+    const noteView = model.viewState.noteViewPage;
+
+    noteView.tripId = trip.id;
+    noteView.isMenuOpen = false;
+    noteView.isDeleteDialogOpen = false;
+
+    goToPage("noteViewPage")
+}
+
