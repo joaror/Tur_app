@@ -168,6 +168,7 @@ function createPreview(text) {
 
   return text.substring(0, maxLength) + "...";
 }
+
 /* Neste ledige id i en liste. Vi bruker den når vi lager nye
    turer og notater, slik at id-ene fortsetter etter der de slutter. */
 function getNextId(array) {
@@ -270,4 +271,19 @@ function getPictureLabel(imageId) {
   }
 
   return "Bilde";
+}
+
+/* Gjør en tekst trygg å putte inn i HTML. Vi bruker den på tekst som
+   kommer fra brukeren, for eksempel søkeord, titler og navn. */
+function escapeHtml(text) {
+  if (!text) {
+    return "";
+  }
+
+  let escaped = text.split("&").join("&amp;");
+  escaped = escaped.split("<").join("&lt;");
+  escaped = escaped.split(">").join("&gt;");
+  escaped = escaped.split('"').join("&quot;");
+
+  return escaped;
 }
