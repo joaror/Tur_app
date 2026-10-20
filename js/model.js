@@ -1,7 +1,5 @@
 const model = {
   app: {
-    // currentPage: "notesPage",
-    // currentPage: "tripsPage",
     currentPage: "loginPage",
   },
 
@@ -70,13 +68,13 @@ const model = {
     },
 
     // Søk
-    // Bør vi ha alle filterne i ett array her?
     searchPage: {
       searchStr: "",
       selectedActivity: null,
       selectedTopic: null,
       season: null,
       searchHits: [],
+      sortOrder: "dateDesc",
     },
 
     // Innstillinger
@@ -84,6 +82,7 @@ const model = {
       newActivity: null,
       newTopic: null,
       newCounty: null,
+      errorMessage: "",
     },
   },
 
@@ -149,7 +148,7 @@ const model = {
       },
       {
         id: 3,
-        activityId: 6,
+        activityId: 1,
         title: "Bærtur til Holtet",
         location: "Holtet",
         date: "2026-08-15",

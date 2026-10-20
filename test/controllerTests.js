@@ -1,6 +1,6 @@
 /* ==========================================================================
-   controllerTests.js – QUnit-tester for loginPageController.js og
-                        tripsPageController.js
+   controllerTests.js – QUnit-tester for loginPageController.js,
+                        tripsPageController.js og settingsPageController.js
 
    Vi tester controller-logikken ved å kontrollere hvordan modellen endres,
    slik retningslinjene sier. Viewet tegnes ikke i disse testene: updateView()
@@ -1118,4 +1118,624 @@ QUnit.module("removePictureFromForm", function () {
         assert.deepEqual(model.viewState.newTripPage.pictures, [1], "listen er uendret");
         assert.notEqual(findImageById(1), null, "bildet er beholdt");
     });
+});
+/* ==========================================================================
+   Tester for settingsPageController.js
+
+   Innstillingscontrolleren legger til og sletter i tre lister i modellen:
+   activities, topics og counties. Den sjekker også om det som skal
+   slettes, er i bruk av en tur eller et notat.
+
+   Derfor tar resetSettingsTest() et bilde av utgangspunktet før første
+   test, og legger alt tilbake før hver test. Slik kan testene regne med
+   de samme sju aktivitetene, de fem emneknaggene og de fem fylkene hver
+   gang, uansett hva de gjør.
+   ========================================================================== */
+
+let settingsTestSnapshot = null;
+
+/* Setter innstillingssiden tilbake til utgangspunktet før hver test. */
+function resetSettingsTest() {
+    if (settingsTestSnapshot === null) {
+        settingsTestSnapshot = {
+            activities: JSON.parse(JSON.stringify(model.data.activities)),
+            topics: JSON.parse(JSON.stringify(model.data.topics)),
+            counties: JSON.parse(JSON.stringify(model.data.counties)),
+            trips: JSON.parse(JSON.stringify(model.data.trips)),
+            notes: JSON.parse(JSON.stringify(model.data.notes)),
+        };
+    }
+
+    model.data.activities = JSON.parse(
+        JSON.stringify(settingsTestSnapshot.activities),
+    );
+    model.data.topics = JSON.parse(
+        JSON.stringify(settingsTestSnapshot.topics),
+    );
+    model.data.counties = JSON.parse(
+        JSON.stringify(settingsTestSnapshot.counties),
+    );
+    model.data.trips = JSON.parse(JSON.stringify(settingsTestSnapshot.trips));
+    model.data.notes = JSON.parse(JSON.stringify(settingsTestSnapshot.notes));
+
+    const settings = model.viewState.settingsPage;
+
+    settings.newActivity = "";
+    settings.newTopic = "";
+    settings.newCounty = "";
+    settings.errorMessage = "";
+
+    updateViewCallCount = 0;
+}
+
+/* Finner navnet på en aktivitet, emneknagg eller fylke med id.
+   Gir tilbake null hvis det ikke finnes noe med den id-en. */
+function findNameById(list, keyName, id) {
+    const item = findObjectById(list, id);
+
+    if (!item) {
+        return null;
+    }
+
+    return item[keyName];
+}
+
+QUnit.module("addActivity", function () {
+    QUnit.test("tomt navn gir feilmelding", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newActivity = "";
+
+        addActivity();
+
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Navnet kan ikke være tomt.",
+            "errorMessage er satt",
+        );
+        assert.equal(
+            model.data.activities.length,
+            7,
+            "ingen aktivitet ble lagt til",
+        );
+        assert.equal(updateViewCallCount, 1, "updateView ble kalt én gang");
+    });
+
+    QUnit.test("mellomrom teller som tomt", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newActivity = "   ";
+
+        addActivity();
+
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Navnet kan ikke være tomt.",
+            "mellomrom er trimmet bort før sjekken",
+        );
+        assert.equal(
+            model.data.activities.length,
+            7,
+            "ingen aktivitet ble lagt til",
+        );
+    });
+
+    QUnit.test("null teller som tomt", function (assert) {
+        /* Feltet er null helt til brukeren skriver noe. Da skal vi få
+           en feilmelding, ikke et crash. */
+        resetSettingsTest();
+        model.viewState.settingsPage.newActivity = null;
+
+        addActivity();
+
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Navnet kan ikke være tomt.",
+            "errorMessage er satt",
+        );
+        assert.equal(
+            model.data.activities.length,
+            7,
+            "ingen aktivitet ble lagt til",
+        );
+    });
+
+    QUnit.test("navn som finnes fra før gir feilmelding", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newActivity = "Bærtur";
+
+        addActivity();
+
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Aktiviteten «Bærtur» finnes allerede.",
+            "errorMessage er satt",
+        );
+        assert.equal(
+            model.data.activities.length,
+            7,
+            "ingen aktivitet ble lagt til",
+        );
+    });
+
+    QUnit.test("store og små bokstaver regnes som likt", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newActivity = "bærtur";
+
+        addActivity();
+
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Aktiviteten «bærtur» finnes allerede.",
+            "navnet skrives slik det ble skrevet inn",
+        );
+        assert.equal(
+            model.data.activities.length,
+            7,
+            "ingen aktivitet ble lagt til",
+        );
+    });
+
+    QUnit.test("ny aktivitet legges til", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newActivity = "Kanotur";
+
+        addActivity();
+
+        assert.equal(
+            model.data.activities.length,
+            8,
+            "én aktivitet ble lagt til",
+        );
+        assert.equal(
+            findNameById(model.data.activities, "activity", 8),
+            "Kanotur",
+            "aktiviteten er lagret",
+        );
+        assert.equal(
+            model.viewState.settingsPage.newActivity,
+            "",
+            "tekstfeltet er tømt",
+        );
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "",
+            "ingen feilmelding",
+        );
+        assert.equal(updateViewCallCount, 1, "updateView ble kalt én gang");
+    });
+
+    QUnit.test("navnet blir trimmet", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newActivity = "  Kanotur  ";
+
+        addActivity();
+
+        assert.equal(
+            findNameById(model.data.activities, "activity", 8),
+            "Kanotur",
+            "navnet er trimmet",
+        );
+    });
+
+    QUnit.test("den nye aktiviteten får neste id", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newActivity = "Kanotur";
+
+        addActivity();
+
+        assert.equal(
+            findObjectById(model.data.activities, 8).id,
+            8,
+            "id-en fortsetter etter de sju aktivitetene vi har",
+        );
+    });
+
+    QUnit.test("tidligere feilmelding fjernes", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newActivity = "Bærtur";
+        addActivity();
+        assert.notEqual(
+            model.viewState.settingsPage.errorMessage,
+            "",
+            "først er det en feil",
+        );
+
+        model.viewState.settingsPage.newActivity = "Kanotur";
+        addActivity();
+
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "",
+            "meldingen er borte",
+        );
+    });
+});
+
+QUnit.module("removeActivity", function () {
+    QUnit.test("ubrukt aktivitet slettes", function (assert) {
+        resetSettingsTest();
+
+        removeActivity(2);
+
+        assert.equal(
+            model.data.activities.length,
+            6,
+            "én aktivitet ble slettet",
+        );
+        assert.equal(
+            findObjectById(model.data.activities, 2),
+            null,
+            "aktiviteten er borte",
+        );
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "",
+            "ingen feilmelding",
+        );
+        assert.equal(updateViewCallCount, 1, "updateView ble kalt én gang");
+    });
+
+    QUnit.test("aktivitet i bruk av en tur kan ikke slettes", function (assert) {
+        /* Tur 3 bruker aktivitet 1 (Bærtur). */
+        resetSettingsTest();
+
+        removeActivity(1);
+
+        assert.notEqual(
+            findObjectById(model.data.activities, 1),
+            null,
+            "aktiviteten er beholdt",
+        );
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Aktiviteten er brukt av en tur, og kan ikke slettes.",
+            "errorMessage er satt",
+        );
+        assert.equal(updateViewCallCount, 1, "updateView ble kalt én gang");
+    });
+
+    QUnit.test("ukjent id sletter ingenting", function (assert) {
+        resetSettingsTest();
+
+        removeActivity(999);
+
+        assert.equal(
+            model.data.activities.length,
+            7,
+            "alle aktivitetene er beholdt",
+        );
+        assert.equal(updateViewCallCount, 0, "updateView ble ikke kalt");
+    });
+});
+
+QUnit.module("addTopic", function () {
+    QUnit.test("tomt navn gir feilmelding", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newTopic = "";
+
+        addTopic();
+
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Navnet kan ikke være tomt.",
+            "errorMessage er satt",
+        );
+        assert.equal(
+            model.data.topics.length,
+            5,
+            "ingen emneknagg ble lagt til",
+        );
+    });
+
+    QUnit.test("navn som finnes fra før gir feilmelding", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newTopic = "Planlegging";
+
+        addTopic();
+
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Emneknaggen «Planlegging» finnes allerede.",
+            "errorMessage er satt",
+        );
+        assert.equal(
+            model.data.topics.length,
+            5,
+            "ingen emneknagg ble lagt til",
+        );
+    });
+
+    QUnit.test("ny emneknagg legges til", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newTopic = "  Ruteinfo  ";
+
+        addTopic();
+
+        assert.equal(model.data.topics.length, 6, "én emneknagg ble lagt til");
+        assert.equal(
+            findNameById(model.data.topics, "topic", 6),
+            "Ruteinfo",
+            "emneknaggen er lagret, og navnet er trimmet",
+        );
+        assert.equal(
+            model.viewState.settingsPage.newTopic,
+            "",
+            "tekstfeltet er tømt",
+        );
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "",
+            "ingen feilmelding",
+        );
+        assert.equal(updateViewCallCount, 1, "updateView ble kalt én gang");
+    });
+});
+
+QUnit.module("removeTopic", function () {
+    QUnit.test("emneknagg i bruk av et notat kan ikke slettes", function (assert) {
+        /* Notat 1 bruker emneknaggene 1, 2 og 5. */
+        resetSettingsTest();
+
+        removeTopic(1);
+
+        assert.notEqual(
+            findObjectById(model.data.topics, 1),
+            null,
+            "emneknaggen er beholdt",
+        );
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Emneknaggen er brukt av et notat, og kan ikke slettes.",
+            "errorMessage er satt",
+        );
+        assert.equal(updateViewCallCount, 1, "updateView ble kalt én gang");
+    });
+
+    QUnit.test("ubrukt emneknagg slettes", function (assert) {
+        /* Alle de fem emneknaggene vi har, er i bruk av et notat. Derfor
+           lager vi en ny først, og sletter den. */
+        resetSettingsTest();
+        model.viewState.settingsPage.newTopic = "Ruteinfo";
+        addTopic();
+
+        removeTopic(6);
+
+        assert.equal(model.data.topics.length, 5, "én emneknagg ble slettet");
+        assert.equal(
+            findObjectById(model.data.topics, 6),
+            null,
+            "emneknaggen er borte",
+        );
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "",
+            "ingen feilmelding",
+        );
+        assert.equal(updateViewCallCount, 2, "updateView ble kalt to ganger");
+    });
+
+    QUnit.test("ukjent id sletter ingenting", function (assert) {
+        resetSettingsTest();
+
+        removeTopic(999);
+
+        assert.equal(
+            model.data.topics.length,
+            5,
+            "alle emneknaggene er beholdt",
+        );
+        assert.equal(updateViewCallCount, 0, "updateView ble ikke kalt");
+    });
+});
+
+QUnit.module("addCounty", function () {
+    QUnit.test("tomt navn gir feilmelding", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newCounty = "";
+
+        addCounty();
+
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Navnet kan ikke være tomt.",
+            "errorMessage er satt",
+        );
+        assert.equal(
+            model.data.counties.length,
+            5,
+            "ingen fylke ble lagt til",
+        );
+    });
+
+    QUnit.test("navn som finnes fra før gir feilmelding", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newCounty = "Oslo";
+
+        addCounty();
+
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Fylket «Oslo» finnes allerede.",
+            "errorMessage er satt",
+        );
+        assert.equal(
+            model.data.counties.length,
+            5,
+            "ingen fylke ble lagt til",
+        );
+    });
+
+    QUnit.test("nytt fylke legges til", function (assert) {
+        resetSettingsTest();
+        model.viewState.settingsPage.newCounty = "  Trøndelag  ";
+
+        addCounty();
+
+        assert.equal(model.data.counties.length, 6, "ett fylke ble lagt til");
+        assert.equal(
+            findNameById(model.data.counties, "county", 6),
+            "Trøndelag",
+            "fylket er lagret, og navnet er trimmet",
+        );
+        assert.equal(
+            model.viewState.settingsPage.newCounty,
+            "",
+            "tekstfeltet er tømt",
+        );
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "",
+            "ingen feilmelding",
+        );
+        assert.equal(updateViewCallCount, 1, "updateView ble kalt én gang");
+    });
+});
+
+QUnit.module("removeCounty", function () {
+    QUnit.test("ubrukt fylke slettes", function (assert) {
+        /* Ingen tur bruker Innlandet (fylke 2). */
+        resetSettingsTest();
+
+        removeCounty(2);
+
+        assert.equal(model.data.counties.length, 4, "ett fylke ble slettet");
+        assert.equal(
+            findObjectById(model.data.counties, 2),
+            null,
+            "fylket er borte",
+        );
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "",
+            "ingen feilmelding",
+        );
+        assert.equal(updateViewCallCount, 1, "updateView ble kalt én gang");
+    });
+
+    QUnit.test("fylke i bruk av en tur kan ikke slettes", function (assert) {
+        /* Tur 3 og tur 5 bruker Agder (fylke 1). */
+        resetSettingsTest();
+
+        removeCounty(1);
+
+        assert.notEqual(
+            findObjectById(model.data.counties, 1),
+            null,
+            "fylket er beholdt",
+        );
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Fylket er brukt av en tur, og kan ikke slettes.",
+            "errorMessage er satt",
+        );
+        assert.equal(updateViewCallCount, 1, "updateView ble kalt én gang");
+    });
+
+    QUnit.test("ukjent id sletter ingenting", function (assert) {
+        resetSettingsTest();
+
+        removeCounty(999);
+
+        assert.equal(
+            model.data.counties.length,
+            5,
+            "alle fylkene er beholdt",
+        );
+        assert.equal(updateViewCallCount, 0, "updateView ble ikke kalt");
+    });
+});
+
+QUnit.module("hjelpefunksjoner i settingsPageController", function () {
+    QUnit.test("isNameAlreadyUsed ser etter likt navn", function (assert) {
+        resetSettingsTest();
+
+        assert.equal(
+            isNameAlreadyUsed(model.data.activities, "activity", "Bærtur"),
+            true,
+            "navnet finnes",
+        );
+        assert.equal(
+            isNameAlreadyUsed(model.data.activities, "activity", "bærTUR"),
+            true,
+            "store og små bokstaver regnes som likt",
+        );
+        assert.equal(
+            isNameAlreadyUsed(model.data.activities, "activity", "Kanotur"),
+            false,
+            "navnet finnes ikke",
+        );
+    });
+
+    QUnit.test("getNewName gir tilbake navnet", function (assert) {
+        resetSettingsTest();
+
+        const navn = getNewName(
+            "  Kanotur  ",
+            model.data.activities,
+            "activity",
+            "Aktiviteten",
+        );
+
+        assert.equal(navn, "Kanotur", "navnet er trimmet og returnert");
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "",
+            "ingen feilmelding",
+        );
+    });
+
+    QUnit.test("getNewName gir null for tomt navn", function (assert) {
+        resetSettingsTest();
+
+        const navn = getNewName(
+            "   ",
+            model.data.activities,
+            "activity",
+            "Aktiviteten",
+        );
+
+        assert.equal(navn, null, "null betyr at vi ikke kan legge til");
+        assert.equal(
+            model.viewState.settingsPage.errorMessage,
+            "Navnet kan ikke være tomt.",
+            "errorMessage er satt",
+        );
+    });
+
+    QUnit.test(
+        "isActivityInUse finner turer som bruker aktiviteten",
+        function (assert) {
+            resetSettingsTest();
+
+            assert.equal(
+                isActivityInUse(1),
+                true,
+                "tur 3 bruker aktivitet 1",
+            );
+            assert.equal(
+                isActivityInUse(2),
+                false,
+                "ingen tur bruker aktivitet 2",
+            );
+        },
+    );
+
+    QUnit.test(
+        "isTopicInUse finner notater som bruker emneknaggen",
+        function (assert) {
+            resetSettingsTest();
+
+            assert.equal(isTopicInUse(1), true, "notat 1 bruker emneknagg 1");
+            assert.equal(isTopicInUse(6), false, "ingen notat bruker emneknagg 6");
+        },
+    );
+
+    QUnit.test(
+        "isCountyInUse finner turer som bruker fylket",
+        function (assert) {
+            resetSettingsTest();
+
+            assert.equal(isCountyInUse(1), true, "tur 3 bruker fylke 1");
+            assert.equal(isCountyInUse(2), false, "ingen tur bruker fylke 2");
+        },
+    );
 });
