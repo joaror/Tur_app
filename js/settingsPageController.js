@@ -171,7 +171,9 @@ function removeCounty(countyId) {
    er bra, eller null hvis navnet er tomt eller finnes fra før. */
 function getNewName(name, list, keyName, label) {
   const settings = model.viewState.settingsPage;
-  const trimmedName = name.trim();
+  /* Feltet er null helt til brukeren skriver noe, så vi må tåle
+     både null og en tom tekst. */
+  const trimmedName = name ? name.trim() : "";
 
   if (trimmedName === "") {
     settings.errorMessage = "Navnet kan ikke være tomt.";
