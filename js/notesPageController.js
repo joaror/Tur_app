@@ -1,5 +1,4 @@
 function addNewNote() {
-    const notes = model.data.notes;
     const noteForm = model.viewState.newNotePage
     const newNote = {
         id : getNextId(notes),
@@ -16,7 +15,7 @@ function addNewNote() {
         description: "",
         topics: [],
     };
-    notes.push(newNote);
+    model.data.notes.push(newNote);
     openNote(newNote.id);
 }
 

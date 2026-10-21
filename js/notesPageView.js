@@ -33,21 +33,22 @@ function updateViewEditNotesPage() {
                         <div class="field">
                             <label>Tittel</label>
                             <input type="text" 
-                                onchange="model.viewState.newNotePage.title = this.value" 
+                                value="${model.viewState.newNotePage.title}"
+                                oninput="model.viewState.newNotePage.title = this.value" 
                                 placeholder="f.eks. Sesongplanlegging vinter 2027" />
                         </div>
 
                         <div class="field">
                             <label>Dato</label>
-                            <input type="date" onchange="model.viewState.newNotePage.date = this.value"/>
+                            <input type="date" value="${model.viewState.newNotePage.date}" onchange="model.viewState.newNotePage.date = this.value"/>
                         </div>
                     
                         <div class="field">
                             <label for="notat">Notat</label>
                             <div class="textarea-wrap">
                                 <textarea id="notat" 
-                                        onchange="model.viewState.newNotePage.description = this.value" 
-                                        placeholder="Skriv dine tanker, refleksjoner eller planer her...">
+                                    placeholder="Skriv dine tanker, refleksjoner eller planer her...">
+                                    ${model.viewState.newNotePage.description}
                                 </textarea>
                                 <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
                                     <svg viewBox="0 0 24 24"
