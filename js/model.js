@@ -64,7 +64,8 @@ const model = {
 
     // Notatdetaljer
     noteViewPage: {
-      noteId: null,
+      noteId: 1,
+      isMenuOpen: false,
     },
 
     // Søk

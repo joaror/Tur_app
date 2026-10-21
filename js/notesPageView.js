@@ -87,8 +87,10 @@ function updateViewEditNotesPage() {
     document.getElementById("app").innerHTML = html;
 }
 
-function updateViewNoteViewPage(noteId) {
-    console.log(noteId);
+function updateViewNoteViewPage() {
+    const id = model.viewState.noteViewPage.noteId
+    const note = findObjectById(model.data.notes, model.viewState.noteViewPage.noteId)
+    console.log(note);
     const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
@@ -96,73 +98,55 @@ function updateViewNoteViewPage(noteId) {
                 
                 <header class="app-header app-header--actions">
                     ${createBackButtonHtml("notesPage")}
-                    <h1>Nytt notat</h1>
+                    <h1>Notat</h1>
                     <div class="header-actions">
+
                         <button class="icon-btn" type="button" id="editBtn" title="Rediger">
-                            <svg viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2">
+                            <svg viewBox="0 0 24 24"  fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                                 <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
                         </button>
+                        
                         <div class="menu-wrap">
-                            <button class="icon-btn" type="button" id="moreBtn" title="Mer">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <circle cx="12" cy="12" r="1" />
-                                <circle cx="19" cy="12" r="1" />
-                                <circle cx="5" cy="12" r="1" />
-                            </svg>
-                            </button>
-                        <div class="menu" id="moreMenu" hidden>
-                            <button class="menu-item" type="button">
-                                <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                >
-                                <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
-                                <polyline points="16 6 12 2 8 6" />
-                                <line x1="12" y1="2" x2="12" y2="15" />
+                            <button class="icon-btn" type="button" onclick="toggleMenu()" title="Mer">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="5" cy="12" r="1" />
+                                    <circle cx="12" cy="12" r="1" />
+                                    <circle cx="19" cy="12" r="1" />
                                 </svg>
-                                Del notat
                             </button>
-                            <button class="menu-item" type="button">
-                                <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                >
-                                <rect x="9" y="9" width="13" height="13" rx="2" />
-                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                                </svg>
-                                Dupliser notat
-                            </button>
-                            <div class="menu-divider"></div>
-                            <button class="menu-item danger" type="button" id="deleteBtn">
-                                <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                >
-                                <polyline points="3 6 5 6 21 6" />
-                                <path
-                                    d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"
-                                />
-                                </svg>
-                                Slett notat
-                            </button>
+
+                            <div class="menu" id="moreMenu" ${model.viewState.noteViewPage.isMenuOpen ? "" : "hidden"}>
+                                <button class="menu-item" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
+                                        <polyline points="16 6 12 2 8 6" />
+                                        <line x1="12" y1="2" x2="12" y2="15" />
+                                    </svg>
+                                    Del notat
+                                </button>
+                                
+                                <button class="menu-item" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" />
+                                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                                    </svg>
+                                    Dupliser notat
+                                </button>
+                                
+                                <div class="menu-divider"></div>
+                                
+                                <button class="menu-item danger" type="button" id="deleteBtn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6" />
+                                        <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                    </svg>
+                                    Slett notat
+                                </button>
                             </div>
                         </div>
+
                     </div>
                 </header>
                 
@@ -170,28 +154,23 @@ function updateViewNoteViewPage(noteId) {
                     <div class="detail-section">
                         <div class="note-detail-head">
                             <span class="meta-chip">
-                                <svg viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                                     <line x1="16" y1="2" x2="16" y2="6" />
                                     <line x1="8" y1="2" x2="8" y2="6" />
                                     <line x1="3" y1="10" x2="21" y2="10" />
                                 </svg>
-                                 5. okt 2026
+                                ${formatDate(note.date)}
                             </span>
-                            <span class="meta-chip">Planlegging</span>
                         </div>
-                        <h2 id="viewTitle">Sesongplanlegging høst 2026</h2>
+                        <h2 id="viewTitle">${note.title}</h2>
                     </div>
                     <div class="detail-section">
-                        <p class="note-detail-text" id="viewText"> </P>
+                        <p class="note-detail-text" id="viewText">${note.description} </P>
                         <div class="note-detail-tags" id="viewTags">
-                            <span class="tag">Planlegging</span>
-                            <span class="tag">Høst</span>
+                            ${getTags(note.topics, 'tag', model.data.topics)}
                         </div>
-                        <p class="note-updated">Sist oppdatert 6. okt 2026 · 19:24</p>
+                        <p class="note-updated">Sist oppdatert: ${formatDate(note.updatedAt)}</p>
                     </div>
                 </div>
 
@@ -346,7 +325,7 @@ function getNotes() {
 
     for (let note of data.notes) {
         html += /* HTML */ `
-            <div class="note-card" onclick="updateViewNoteViewPage(${note.id})">
+            <div class="note-card" onclick="openNote(${note.id})">
                 <div class="note-card-header">
                     <span class="note-date">${formatDate(note.date)}</span>
                 </div>

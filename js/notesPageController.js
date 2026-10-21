@@ -41,3 +41,13 @@ function openNote(noteId) {
     goToPage("noteViewPage")
 }
 
+function toggleMenu(params) {
+    const menu = model.viewState.noteViewPage;
+    menu.isMenuOpen = !menu.isMenuOpen
+    updateViewNoteViewPage()
+}
+
+function openNote(id) {
+    model.viewState.noteViewPage.noteId = id
+    goToPage('noteViewPage')
+}
