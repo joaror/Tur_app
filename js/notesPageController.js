@@ -49,4 +49,5 @@ function toggleTopic(topicId) {
     } else {
         note.push(topicId)
     }
+    updateView()
 }

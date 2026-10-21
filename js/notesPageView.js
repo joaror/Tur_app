@@ -302,21 +302,29 @@ function createFooter(page) {
     return html;
 }
 
-function getTags(tags, styletag, modelobject) {
+function getTags(tags, styleTag, modelObject) {
+    const isSelected = model.viewState.newNotePage.topics
     let html = "";
-    for (let tag of tags) {
-        html += /* HTML */ `
-            <span
-                class=${styletag}
-                ${modelobject
-                    ? ""
-                    : /* HTML */ ` onclick="toggleTopic(${tag.id})"`}
-            >
-                ${modelobject ? findObjectById(modelobject, tag).topic : tag.topic}
-            </span>
-        `;
+
+    if (modelObject){
+        for (let tag of tags) {
+            html += /*HTML*/ `
+                <span class="${styleTag}">
+                    ${findObjectById(modelObject, tag).topic}
+                </span>
+            `;
+        }
+        return html
+    } else {
+        for (let tag of tags) {
+            html += /* HTML */ `
+                <span class="${styleTag} ${isSelected.includes(tag.id) ? 'selected': ''}" onclick="toggleTopic(${tag.id})">
+                    ${tag.topic}
+                </span>
+            `;
+        }
+        return html;
     }
-    return html;
 }
 
 function getNotes() {
