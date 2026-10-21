@@ -64,7 +64,7 @@ const model = {
 
     // Notatdetaljer
     noteViewPage: {
-      noteId: 1,
+      noteId: null,
       isMenuOpen: false,
     },
 

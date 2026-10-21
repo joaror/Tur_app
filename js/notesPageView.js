@@ -90,7 +90,7 @@ function updateViewEditNotesPage() {
 function updateViewNoteViewPage() {
     const id = model.viewState.noteViewPage.noteId
     const note = findObjectById(model.data.notes, model.viewState.noteViewPage.noteId)
-    console.log(note);
+    // console.log(note);
     const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
@@ -310,7 +310,7 @@ function getTags(tags, styletag, modelobject) {
                 class=${styletag}
                 ${modelobject
                     ? ""
-                    : /* HTML */ ` onclick="model.viewState.newNotePage.topics.push(${tag.id})"`}
+                    : /* HTML */ ` onclick="toggleTopic(${tag.id})"`}
             >
                 ${modelobject ? findObjectById(modelobject, tag).topic : tag.topic}
             </span>

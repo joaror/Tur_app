@@ -1,12 +1,14 @@
 function addNewNote() {
-    let noteForm = model.viewState.newNotePage;
     const notes = model.data.notes;
-
-    noteForm.noteId = getNextId(notes);
-    noteForm.date = noteForm.date;
-    noteForm.updatedAt = getTimestamp();
-
-    notes.push(noteForm);
+    const noteForm = model.viewState.newNotePage
+    const newNote = {
+        id : getNextId(notes),
+        title : noteForm.title,
+        date : noteForm.date,
+        description : noteForm.description,
+        topics : noteForm.topics,
+        updatedAt : getTimestamp(),
+    } 
 
     model.viewState.newNotePage = {
         title: "",
@@ -14,34 +16,20 @@ function addNewNote() {
         description: "",
         topics: [],
     };
-
-    goToPage("notesPage");
+    notes.push(newNote);
+    openNote(newNote.id);
 }
 
-function checkFormComplete(params) {
-    const form = model.viewState.newNotePage;
+// function checkFormComplete(params) {
+//     const form = model.viewState.newNotePage;
 
-    if (form.title == "" || form.date == "" || form.description == "" || form.topics.length <= 0) {
-        alert("fullfør");
-    } else {
-    }
-}
+//     if (form.title == "" || form.date == "" || form.description == "" || form.topics.length <= 0) {
+//         alert("fullfør");
+//     } else {
+//     }
+// }
 
-function openNote(noteId) {
-    const note = findObjectById(model.data.notes, noteId);
-
-    if (!note) return;
-
-    const noteView = model.viewState.noteViewPage;
-
-    noteView.tripId = trip.id;
-    noteView.isMenuOpen = false;
-    noteView.isDeleteDialogOpen = false;
-
-    goToPage("noteViewPage")
-}
-
-function toggleMenu(params) {
+function toggleMenu() {
     const menu = model.viewState.noteViewPage;
     menu.isMenuOpen = !menu.isMenuOpen
     updateViewNoteViewPage()
@@ -50,4 +38,15 @@ function toggleMenu(params) {
 function openNote(id) {
     model.viewState.noteViewPage.noteId = id
     goToPage('noteViewPage')
+}
+
+function toggleTopic(topicId) {
+    const note = model.viewState.newNotePage.topics
+    if (note.includes(topicId)){
+        for (let i = 0; i < note.length; i++) {
+            if(note[i] == topicId) note.splice(i, 1)
+        }
+    } else {
+        note.push(topicId)
+    }
 }
