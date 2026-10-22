@@ -41,7 +41,7 @@ function openNote(id) {
 }
 
 function toggleTopic(topicId) {
-    const note = model.viewState.newNotePage.topics
+    const note = selectedNote().topics
     if (note.includes(topicId)){
         for (let i = 0; i < note.length; i++) {
             if(note[i] == topicId) note.splice(i, 1)
@@ -50,4 +50,24 @@ function toggleTopic(topicId) {
         note.push(topicId)
     }
     updateView()
+}
+
+function editNote() {
+    const selectedNote = model.viewState.noteViewPage
+    selectedNote.isEditing = true
+    goToPage('editNotePage')
+}
+
+function selectedNote() {
+    if(model.viewState.noteViewPage.isEditing) {
+        return findObjectById(model.data.notes, model.viewState.noteViewPage.noteId)
+    } else {
+        return model.viewState.newNotePage
+    }
+}
+
+function resetNoteActions() {
+    const note = model.viewState.noteViewPage
+    note.noteId = null
+    note.isEditing = false
 }

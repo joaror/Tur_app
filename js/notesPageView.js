@@ -18,6 +18,7 @@ function updateViewNotesPage() {
 }
 
 function updateViewEditNotesPage() {
+    
     const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
@@ -33,14 +34,14 @@ function updateViewEditNotesPage() {
                         <div class="field">
                             <label>Tittel</label>
                             <input type="text" 
-                                value="${model.viewState.newNotePage.title}"
-                                oninput="model.viewState.newNotePage.title = this.value" 
+                                value="${selectedNote().title}"
+                                oninput="selectedNote().title = this.value" 
                                 placeholder="f.eks. Sesongplanlegging vinter 2027" />
                         </div>
 
                         <div class="field">
                             <label>Dato</label>
-                            <input type="date" value="${model.viewState.newNotePage.date}" onchange="model.viewState.newNotePage.date = this.value"/>
+                            <input type="date" value="${selectedNote().date}" onchange="model.viewState.newNotePage.date = this.value"/>
                         </div>
                     
                         <div class="field">
@@ -48,7 +49,7 @@ function updateViewEditNotesPage() {
                             <div class="textarea-wrap">
                                 <textarea id="notat" 
                                     oninput="model.viewState.newNotePage.description = this.value"
-                                    placeholder="Skriv dine tanker, refleksjoner eller planer her...">${model.viewState.newNotePage.description ? model.viewState.newNotePage.description : ''}</textarea>
+                                    placeholder="Skriv dine tanker, refleksjoner eller planer her...">${selectedNote().description ? selectedNote().description : ''}</textarea>
                                 <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
                                     <svg viewBox="0 0 24 24"
                                         fill="none" 
@@ -101,7 +102,7 @@ function updateViewNoteViewPage() {
                     <h1>Notat</h1>
                     <div class="header-actions">
 
-                        <button class="icon-btn" type="button" id="editBtn" title="Rediger">
+                        <button class="icon-btn" type="button" id="editBtn" onclick="editNote()" title="Rediger">
                             <svg viewBox="0 0 24 24"  fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                                 <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -118,14 +119,6 @@ function updateViewNoteViewPage() {
                             </button>
 
                             <div class="menu" id="moreMenu" ${model.viewState.noteViewPage.isMenuOpen ? "" : "hidden"}>
-                                <button class="menu-item" type="button">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
-                                        <polyline points="16 6 12 2 8 6" />
-                                        <line x1="12" y1="2" x2="12" y2="15" />
-                                    </svg>
-                                    Del notat
-                                </button>
                                 
                                 <button class="menu-item" type="button">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -303,7 +296,7 @@ function createFooter(page) {
 }
 
 function getTags(tags, styleTag, modelObject) {
-    const isSelected = model.viewState.newNotePage.topics
+    const isSelected = selectedNote().topics
     let html = "";
 
     if (modelObject){
@@ -330,6 +323,7 @@ function getTags(tags, styleTag, modelObject) {
 function getNotes() {
     const data = model.data;
     let html = "";
+    resetNoteActions()
 
     for (let note of data.notes) {
         html += /* HTML */ `

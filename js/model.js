@@ -66,6 +66,7 @@ const model = {
     noteViewPage: {
       noteId: null,
       isMenuOpen: false,
+      isEditing: false,
     },
 
     // Søk
