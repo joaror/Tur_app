@@ -47,9 +47,8 @@ function updateViewEditNotesPage() {
                             <label for="notat">Notat</label>
                             <div class="textarea-wrap">
                                 <textarea id="notat" 
-                                    placeholder="Skriv dine tanker, refleksjoner eller planer her...">
-                                    ${model.viewState.newNotePage.description}
-                                </textarea>
+                                    oninput="model.viewState.newNotePage.description = this.value"
+                                    placeholder="Skriv dine tanker, refleksjoner eller planer her...">${model.viewState.newNotePage.description ? model.viewState.newNotePage.description : ''}</textarea>
                                 <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
                                     <svg viewBox="0 0 24 24"
                                         fill="none" 
