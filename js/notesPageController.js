@@ -1,7 +1,7 @@
 function addNewNote() {
     const noteForm = model.viewState.newNotePage
     const newNote = {
-        id : getNextId(notes),
+        id : getNextId(model.data.notes),
         title : noteForm.title,
         date : noteForm.date,
         description : noteForm.description,

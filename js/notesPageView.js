@@ -1,5 +1,5 @@
 function updateViewNotesPage() {
-    const html = /*HTML*/ `
+  const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
                 ${createStatusBarHtml()}
@@ -14,11 +14,11 @@ function updateViewNotesPage() {
             </div>
         </div>
     `;
-    document.getElementById("app").innerHTML = html;
+  document.getElementById("app").innerHTML = html;
 }
 
 function updateViewEditNotesPage() {
-    const html = /*HTML*/ `
+  const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
                 ${createStatusBarHtml()}
@@ -47,9 +47,8 @@ function updateViewEditNotesPage() {
                             <label for="notat">Notat</label>
                             <div class="textarea-wrap">
                                 <textarea id="notat" 
-                                    placeholder="Skriv dine tanker, refleksjoner eller planer her...">
-                                    ${model.viewState.newNotePage.description}
-                                </textarea>
+                                        oninput="model.viewState.newNotePage.description = this.value" 
+                                        placeholder="Skriv dine tanker, refleksjoner eller planer her...">${model.viewState.newNotePage.description}</textarea>
                                 <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
                                     <svg viewBox="0 0 24 24"
                                         fill="none" 
@@ -85,14 +84,17 @@ function updateViewEditNotesPage() {
         </div>
 
     `;
-    document.getElementById("app").innerHTML = html;
+  document.getElementById("app").innerHTML = html;
 }
 
 function updateViewNoteViewPage() {
-    const id = model.viewState.noteViewPage.noteId
-    const note = findObjectById(model.data.notes, model.viewState.noteViewPage.noteId)
-    // console.log(note);
-    const html = /*HTML*/ `
+  const id = model.viewState.noteViewPage.noteId;
+  const note = findObjectById(
+    model.data.notes,
+    model.viewState.noteViewPage.noteId,
+  );
+  // console.log(note);
+  const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
                 ${createStatusBarHtml()}
@@ -167,9 +169,9 @@ function updateViewNoteViewPage() {
                         <h2 id="viewTitle">${note.title}</h2>
                     </div>
                     <div class="detail-section">
-                        <p class="note-detail-text" id="viewText">${note.description} </P>
+                        <p class="note-detail-text" id="viewText">${note.description}</p>
                         <div class="note-detail-tags" id="viewTags">
-                            ${getTags(note.topics, 'tag', model.data.topics)}
+                            ${getTags(note.topics, "tag", model.data.topics)}
                         </div>
                         <p class="note-updated">Sist oppdatert: ${formatDate(note.updatedAt)}</p>
                     </div>
@@ -237,116 +239,110 @@ function updateViewNoteViewPage() {
         </div>
       </div>
     `;
-    document.getElementById("app").innerHTML = html;
+  document.getElementById("app").innerHTML = html;
 }
 
 function createHeader(page) {
-    let html = "";
-    if (page == "notesPage") {
-        html = /*HTML*/ `
+  let html = "";
+  if (page == "notesPage") {
+    html = /*HTML*/ `
             <header class="app-header">
                 <h1>Notater</h1>
             </header>
         `;
-    } else if (page == "editNotePage") {
-        html = /*HTML*/ `
+  } else if (page == "editNotePage") {
+    html = /*HTML*/ `
             <header class="app-header app-header--actions">
                 ${createBackButtonHtml("notesPage")}
                 <h1>Nytt notat</h1>
             </header>
         `;
-    } else if (page == "noteViewPage") {
-        html /*HTML*/ ``;
-    }
-    return html;
+  } else if (page == "noteViewPage") {
+    html /*HTML*/ ``;
+  }
+  return html;
 }
 
 function createMainContent(page) {
-    let html = "";
-    if (page == "notesPage") {
-        html = /*HTML*/ `
+  let html = "";
+  if (page == "notesPage") {
+    html = /*HTML*/ `
             <main class="content">
                 ${getNotes()}
             </main>
         `;
-    } else if (page == "editNotePage") {
-        html = /*HTML*/ `
+  } else if (page == "editNotePage") {
+    html = /*HTML*/ `
             <main class="content">
                 ${updateViewEditNotesPage()}
             </main>
         `;
-    } else if (page == "noteViewPage") {
-        html = /*HTML*/ `
+  } else if (page == "noteViewPage") {
+    html = /*HTML*/ `
             <main class="content">
                 ${updateViewNoteViewPage()}
             </main>
         `;
-    }
-    return html;
+  }
+  return html;
 }
 
 function createFooter(page) {
-    let html = "";
-    if (page == "notesPage") {
-        html = /*HTML*/ `
+  let html = "";
+  if (page == "notesPage") {
+    html = /*HTML*/ `
             ${createBottomNavHtml("notesPage")}
             ${createFloatingActionHtml("goToPage('editNotePage');", "Nytt notat")}
         `;
-    } else if (page == "editNotePage") {
-        html = /*HTML*/ `
+  } else if (page == "editNotePage") {
+    html = /*HTML*/ `
             <div class="action-bar">
                 <button class="btn btn-secondary" onclick="goToPage('notesPage')">Avbryt</button>
                 <button class="btn btn-primary" onclick="addNewNote()">Lagre</button>
             </div>
         `;
-    }
-    return html;
+  }
+  return html;
 }
 
-function getTags(tags, styleTag, modelObject) {
-    const isSelected = model.viewState.newNotePage.topics
-    let html = "";
-
-    if (modelObject){
-        for (let tag of tags) {
-            html += /*HTML*/ `
-                <span class="${styleTag}">
-                    ${findObjectById(modelObject, tag).topic}
-                </span>
-            `;
-        }
-        return html
-    } else {
-        for (let tag of tags) {
-            html += /* HTML */ `
-                <span class="${styleTag} ${isSelected.includes(tag.id) ? 'selected': ''}" onclick="toggleTopic(${tag.id})">
-                    ${tag.topic}
-                </span>
-            `;
-        }
-        return html;
-    }
+function getTags(tags, styletag, modelobject) {
+  let html = "";
+  for (let tag of tags) {
+    html += /* HTML */ `
+      <span
+        class=${styletag}
+        ${modelobject ? "" : /* HTML */ ` onclick="toggleTopic(${tag.id})"`}
+      >
+        ${modelobject ? findObjectById(modelobject, tag).topic : tag.topic}
+      </span>
+    `;
+  }
+  return html;
 }
 
 function getNotes() {
-    const data = model.data;
-    let html = "";
+  const data = model.data;
+  let html = "";
 
-    for (let note of data.notes) {
-        html += /* HTML */ `
-            <div class="note-card" onclick="openNote(${note.id})">
-                <div class="note-card-header">
-                    <span class="note-date">${formatDate(note.date)}</span>
-                </div>
-                <h2>${note.title}</h2>
-                <p>${note.description}</p>
-                <div class="tags">
-                    ${getTags(findObjectById(data.notes, note.id).topics, "tag", data.topics)}
-                </div>
-            </div>
-        `;
-    }
-    return html;
+  for (let note of data.notes) {
+    html += /* HTML */ `
+      <div class="note-card" onclick="openNote(${note.id})">
+        <div class="note-card-header">
+          <span class="note-date">${formatDate(note.date)}</span>
+        </div>
+        <h2>${note.title}</h2>
+        <p>${note.description}</p>
+        <div class="tags">
+          ${getTags(
+            findObjectById(data.notes, note.id).topics,
+            "tag",
+            data.topics,
+          )}
+        </div>
+      </div>
+    `;
+  }
+  return html;
 }
 
 // prototype rest 45 - notat-detaljer.html.
