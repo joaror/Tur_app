@@ -18,7 +18,7 @@ function updateViewNotesPage() {
 }
 
 function updateViewEditNotesPage() {
-    
+    const selectedForm  = model.viewState.noteViewPage.isEditing ? model.viewState.editNotePage : model.viewState.newNotePage;
     const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
@@ -41,14 +41,14 @@ function updateViewEditNotesPage() {
 
                         <div class="field">
                             <label>Dato</label>
-                            <input type="date" value="${selectedNote().date}" onchange="model.viewState.newNotePage.date = this.value"/>
+                            <input type="date" value="${selectedNote().date}" onchange="selectedNote().date = this.value"/>
                         </div>
                     
                         <div class="field">
                             <label for="notat">Notat</label>
                             <div class="textarea-wrap">
                                 <textarea id="notat" 
-                                    oninput="model.viewState.newNotePage.description = this.value"
+                                    oninput="selectedNote() = this.value"
                                     placeholder="Skriv dine tanker, refleksjoner eller planer her...">${selectedNote().description ? selectedNote().description : ''}</textarea>
                                 <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
                                     <svg viewBox="0 0 24 24"
@@ -78,7 +78,7 @@ function updateViewEditNotesPage() {
                 
                 <div class="action-bar">
                     <button class="btn btn-secondary" onclick="goToPage('notesPage')">Avbryt</button>
-                    <button class="btn btn-primary" onclick="addNewNote()">Lagre</button>
+                    <button class="btn btn-primary" onclick="saveNote()">Lagre</button>
                 </div>
                 
             </div>
@@ -89,9 +89,7 @@ function updateViewEditNotesPage() {
 }
 
 function updateViewNoteViewPage() {
-    const id = model.viewState.noteViewPage.noteId
     const note = findObjectById(model.data.notes, model.viewState.noteViewPage.noteId)
-    // console.log(note);
     const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
@@ -166,68 +164,8 @@ function updateViewNoteViewPage() {
                         <p class="note-updated">Sist oppdatert: ${formatDate(note.updatedAt)}</p>
                     </div>
                 </div>
-
-      <!-- Redigeringsmodus (skjulles til pennikonappen trykkes) -->
-      <div class="form-body edit-mode" id="editMode" hidden>
-        <div class="field">
-          <label for="fTittel">Tittel</label>
-          <input type="text" id="fTittel" value="Sesongplanlegging høst 2026" />
+            </div>
         </div>
-
-        <div class="field">
-          <label for="fDato">Dato</label>
-          <input type="date" id="fDato" value="2026-10-05" />
-        </div>
-
-        <div class="field">
-          <label for="fNotat">Notat</label>
-          <div class="textarea-wrap">
-            <textarea id="fNotat">Bør prioritere turer i septemberoktober før snøen legger seg i høyden. Har lyst til å prøve Nordkapp-turen igjen, kanskje kombinere med båt.
-            Måltall for høsten er tre overnattingsturer og én fisketur. Utstyret er nesten klart, men sekken må byttes før frosten setter inn.
-            Neste steg: bestill billetter og legg inn planlagte turer i appen, slik at kalenderen viser hva som allerede er booket.</textarea>
-            <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-            </button>
-          </div>
-          <p class="mic-status" id="micStatus" hidden></p>
-        </div>
-
-        <div class="tags-field">
-          <label>Emneknagger</label>
-          <div class="tag-chips" id="tagChips">
-            <button type="button" class="chip selected">Planlegging</button>
-            <button type="button" class="chip">Utstyr</button>
-            <button type="button" class="chip">Refleksjon</button>
-            <button type="button" class="chip">Mål</button>
-            <button type="button" class="chip">Tips</button>
-            <button type="button" class="chip">Høst</button>
-          </div>
-          <p class="unsaved-hint" id="unsavedHint" hidden>Ulagrede endringer</p>
-        </div>
-      </div>
-
-      <div class="action-bar" id="actionBar" hidden>
-        <button class="btn btn-secondary" type="button" id="cancelEdit">Avbryt</button>
-        <button class="btn btn-primary" type="button" id="saveEdit">Lagre</button>
-      </div>
-
-      <div class="dialog-backdrop" id="deleteDialog" hidden>
-        <div class="dialog">
-          <h2 class="dialog-title">Slette notatet?</h2>
-          <p class="dialog-text">
-            «Sesongplanlegging høst 2026» blir permanent slettet. Dette kan ikke
-            angres.
-          </p>
-          <div class="dialog-actions">
-            <button class="dialog-btn" type="button" id="cancelDelete">
-              Avbryt
-            </button>
-            <button class="dialog-btn danger" type="button" id="confirmDelete">
-              Slett notat
-            </button>
-          </div>
-        </div>
-      </div>
     `;
     document.getElementById("app").innerHTML = html;
 }
@@ -288,7 +226,7 @@ function createFooter(page) {
         html = /*HTML*/ `
             <div class="action-bar">
                 <button class="btn btn-secondary" onclick="goToPage('notesPage')">Avbryt</button>
-                <button class="btn btn-primary" onclick="addNewNote()">Lagre</button>
+                <button class="btn btn-primary" onclick="saveNote()">Lagre</button>
             </div>
         `;
     }
