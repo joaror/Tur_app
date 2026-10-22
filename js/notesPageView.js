@@ -88,13 +88,10 @@ function updateViewEditNotesPage() {
 }
 
 function updateViewNoteViewPage() {
-  const id = model.viewState.noteViewPage.noteId;
-  const note = findObjectById(
-    model.data.notes,
-    model.viewState.noteViewPage.noteId,
-  );
-  // console.log(note);
-  const html = /*HTML*/ `
+    const id = model.viewState.noteViewPage.noteId
+    const note = findObjectById(model.data.notes, model.viewState.noteViewPage.noteId)
+    // console.log(note);
+    const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
                 ${createStatusBarHtml()}
@@ -120,7 +117,7 @@ function updateViewNoteViewPage() {
                                 </svg>
                             </button>
 
-                            <div class="menu" id="moreMenu" ${model.viewState.noteViewPage.isMenuOpen ? "" : "hidden"}>
+                            <div class="menu" id="moreMenu" ${noteState.isMenuOpen ? "" : "hidden"}>
                                 <button class="menu-item" type="button">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
@@ -305,19 +302,29 @@ function createFooter(page) {
   return html;
 }
 
-function getTags(tags, styletag, modelobject) {
-  let html = "";
-  for (let tag of tags) {
-    html += /* HTML */ `
-      <span
-        class=${styletag}
-        ${modelobject ? "" : /* HTML */ ` onclick="toggleTopic(${tag.id})"`}
-      >
-        ${modelobject ? findObjectById(modelobject, tag).topic : tag.topic}
-      </span>
-    `;
-  }
-  return html;
+function getTags(tags, styleTag, modelObject) {
+    const isSelected = model.viewState.newNotePage.topics
+    let html = "";
+
+    if (modelObject){
+        for (let tag of tags) {
+            html += /*HTML*/ `
+                <span class="${styleTag}">
+                    ${findObjectById(modelObject, tag).topic}
+                </span>
+            `;
+        }
+        return html
+    } else {
+        for (let tag of tags) {
+            html += /* HTML */ `
+                <span class="${styleTag} ${isSelected.includes(tag.id) ? 'selected': ''}" onclick="toggleTopic(${tag.id})">
+                    ${tag.topic}
+                </span>
+            `;
+        }
+        return html;
+    }
 }
 
 function getNotes() {
@@ -345,8 +352,6 @@ function getNotes() {
   return html;
 }
 
-// prototype rest 45 - notat-detaljer.html.
-// Detaljvisning av enkeltnotat. Ikke implementert.
 // prototype rest117
 
 // updateViewNotesPage()
