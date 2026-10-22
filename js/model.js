@@ -52,6 +52,7 @@ const model = {
       date: "",
       description: "",
       topics: [],
+      errorMessage: "",
     },
 
     editNotePage: {
@@ -60,6 +61,7 @@ const model = {
       date: "",
       description: "",
       topics: [],
+      errorMessage: "",
     },
 
     // Notatdetaljer
@@ -67,6 +69,7 @@ const model = {
       noteId: null,
       isMenuOpen: false,
       isEditing: false,
+      isDeleteDialogOpen: false,
     },
 
     // Søk
