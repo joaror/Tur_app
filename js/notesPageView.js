@@ -47,8 +47,8 @@ function updateViewEditNotesPage() {
                             <label for="notat">Notat</label>
                             <div class="textarea-wrap">
                                 <textarea id="notat" 
+                                    oninput="model.viewState.newNotePage.description = this.value"
                                     placeholder="Skriv dine tanker, refleksjoner eller planer her...">
-                                    ${model.viewState.newNotePage.description}
                                 </textarea>
                                 <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
                                     <svg viewBox="0 0 24 24"
@@ -89,8 +89,8 @@ function updateViewEditNotesPage() {
 }
 
 function updateViewNoteViewPage() {
-    const id = model.viewState.noteViewPage.noteId
-    const note = findObjectById(model.data.notes, model.viewState.noteViewPage.noteId)
+    const noteState = model.viewState.noteViewPage;
+    const note = findObjectById(model.data.notes, noteState.noteId);
     // console.log(note);
     const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
@@ -118,7 +118,7 @@ function updateViewNoteViewPage() {
                                 </svg>
                             </button>
 
-                            <div class="menu" id="moreMenu" ${model.viewState.noteViewPage.isMenuOpen ? "" : "hidden"}>
+                            <div class="menu" id="moreMenu" ${noteState.isMenuOpen ? "" : "hidden"}>
                                 <button class="menu-item" type="button">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
@@ -169,7 +169,7 @@ function updateViewNoteViewPage() {
                     <div class="detail-section">
                         <p class="note-detail-text" id="viewText">${note.description} </P>
                         <div class="note-detail-tags" id="viewTags">
-                            ${getTags(note.topics, 'tag', model.data.topics)}
+                            ${getTags(note.topics, "tag", model.data.topics)}
                         </div>
                         <p class="note-updated">Sist oppdatert: ${formatDate(note.updatedAt)}</p>
                     </div>
@@ -304,10 +304,10 @@ function createFooter(page) {
 }
 
 function getTags(tags, styleTag, modelObject) {
-    const isSelected = model.viewState.newNotePage.topics
+    const isSelected = model.viewState.newNotePage.topics;
     let html = "";
 
-    if (modelObject){
+    if (modelObject) {
         for (let tag of tags) {
             html += /*HTML*/ `
                 <span class="${styleTag}">
@@ -315,11 +315,13 @@ function getTags(tags, styleTag, modelObject) {
                 </span>
             `;
         }
-        return html
+        return html;
     } else {
         for (let tag of tags) {
             html += /* HTML */ `
-                <span class="${styleTag} ${isSelected.includes(tag.id) ? 'selected': ''}" onclick="toggleTopic(${tag.id})">
+                <span
+                    class="${styleTag} ${isSelected.includes(tag.id) ? "selected" : ""}"
+                    onclick="toggleTopic(${tag.id})">
                     ${tag.topic}
                 </span>
             `;
@@ -349,8 +351,6 @@ function getNotes() {
     return html;
 }
 
-// prototype rest 45 - notat-detaljer.html.
-// Detaljvisning av enkeltnotat. Ikke implementert.
 // prototype rest117
 
 // updateViewNotesPage()

@@ -1650,7 +1650,7 @@ a.note-card:hover {
   line-height: 1.65;
   color: var(--fg);
   margin: 0;
-  white-space: pre-wrap;
+  white-space: pre-line;
 }
 
 .note-detail-tags {
