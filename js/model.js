@@ -240,7 +240,7 @@ const model = {
         id: 1,
         title: "Sesongplanlegging høst 2026",
         date: "2026-09-05",
-        description: `Bør prioritere turer i september–oktober før snøen legger seg i høyden. Har lyst til å prøve Nordkapp-turen igjen, kanskje kombinere med båt. Måltall for høsten er tre overnattingsturer og én fisketur. Utstyret er nesten klart, men sekken må byttes før frosten setter inn. Neste steg: bestill billetter og legg inn planlagte turer i appen, slik at kalenderen viser hva som allerede er booket.`,
+        description: `Bør prioritere turer i september–oktober før snøen legger seg i høyden. Har lyst til å prøve Nordkapp-turen igjen, kanskje kombinere med båt. Måltall for høsten er tre overnattingsturer og én fisketur. Utstyret er nesten klart, men sekken må byttes før           frosten setter inn. Neste steg: bestill billetter og legg inn planlagte turer i appen, slik at kalenderen viser hva som allerede er booket.`,
         topics: [1, 2, 5],
         updatedAt: "2026-10-06T19:24",
       },
