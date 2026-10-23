@@ -59,13 +59,27 @@ function toggleTopic(topicId) {
     updateView();
 }
 
+function deleteNote() {
+    model.data.notes.splice(
+        findIndexById(model.data.notes, model.viewState.noteViewPage.noteId),
+        1,
+    );
+    resetNoteActions();
+    goToPage("notesPage");
+}
+
+function deleteDialog() {
+    model.viewState.noteViewPage.isDeleteDialogOpen = true;
+    updateViewNoteViewPage();
+}
+
 function editNote() {
     const notesVault = structuredClone(model.data.notes);
-    const selectedNote = model.viewState.noteViewPage;
-    model.viewState.editNotePage = notesVault[findIndexById(notesVault, selectedNote.noteId)];
+    const selectedNote = model.viewState;
+    selectedNote.editNotePage = notesVault[findIndexById(notesVault, selectedNote.noteViewPage.noteId)];
 
-    selectedNote.isEditing = true;
-    goToPage("editNotePage");
+    selectedNote.noteViewPage.isEditing = true;
+    model.app.currentPage == "editNotePage" ? updateViewEditNotesPage() : goToPage("editNotePage");
 }
 
 function selectedNote() {
@@ -78,14 +92,22 @@ function selectedNote() {
 }
 
 function resetNoteActions() {
-    const note = model.viewState.noteViewPage;
-    note.noteId = null;
-    note.isEditing = false;
+    model.viewState.noteViewPage = {
+        noteId: null,
+        isMenuOpen: false,
+        isEditing: false,
+        isDeleteDialogOpen: false,
+    };
 }
 
-function cancelSaveNote() {
+function cancelNote() {
     const data = model.viewState;
 
+    if (data.noteViewPage.isDeleteDialogOpen) {
+        data.noteViewPage.isDeleteDialogOpen = false;
+        data.noteViewPage.isMenuOpen = false;
+    }
+    
     data.editNotePage = {
         noteId: null,
         title: "",
@@ -102,5 +124,5 @@ function cancelSaveNote() {
         topics: [],
         errorMessage: "",
     };
-    goToPage(data.noteViewPage.noteId == null ? "notesPage" : "noteViewPage");
+    data.noteViewPage.noteId == null ? updateViewNotesPage() : updateViewNoteViewPage();
 }

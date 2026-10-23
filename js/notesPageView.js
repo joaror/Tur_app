@@ -24,7 +24,7 @@ function updateViewEditNotesPage() {
                 ${createStatusBarHtml()}
                 
                 <header class="app-header app-header--actions">
-                    ${createBackButtonHtml("notesPage", "cancelSaveNote()")}
+                    ${createBackButtonHtml("notesPage", "cancelNote()")}
                     <h1>Nytt notat</h1>
                 </header>
 
@@ -76,7 +76,7 @@ function updateViewEditNotesPage() {
                 </main>
                 
                 <div class="action-bar">
-                    <button class="btn btn-secondary" onclick="cancelSaveNote()">Avbryt</button>
+                    <button class="btn btn-secondary" onclick="cancelNote()">Avbryt</button>
                     <button class="btn btn-primary" onclick="saveNote()">Lagre</button>
                 </div>
                 
@@ -126,7 +126,7 @@ function updateViewNoteViewPage() {
                                 
                                 <div class="menu-divider"></div>
                                 
-                                <button class="menu-item danger" type="button" id="deleteBtn">
+                                <button class="menu-item danger" type="button" onclick="deleteDialog()" id="deleteBtn">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polyline points="3 6 5 6 21 6" />
                                         <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
@@ -162,6 +162,7 @@ function updateViewNoteViewPage() {
                         <p class="note-updated">Sist oppdatert: ${formatDate(note.updatedAt)}</p>
                     </div>
                 </div>
+                ${createNoteDeleteDialogHtml(note, model.viewState.noteViewPage.isDeleteDialogOpen)}
             </div>
         </div>
     `;
@@ -229,6 +230,32 @@ function createFooter(page) {
         `;
     }
     return html;
+}
+
+function createNoteDeleteDialogHtml(note, isDeleteDialogOpen) {
+  if (!isDeleteDialogOpen) {
+    return /*HTML*/ `<div class="dialog-backdrop" hidden></div>`;
+  }
+
+  return /*HTML*/ `
+        <div class="dialog-backdrop">
+            <div class="dialog">
+                <h2 class="dialog-title">Slette notatet?</h2>
+                <p class="dialog-text">
+                    «${note.title}» blir permanent slettet.
+                    Dette kan ikke angres.
+                </p>
+                <div class="dialog-actions">
+                    <button class="dialog-btn" type="button" onclick="cancelNote();">
+                        Avbryt
+                    </button>
+                    <button class="dialog-btn danger" type="button" onclick="deleteNote();">
+                        Slett notat
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function getTags(tags, styleTag, modelObject) {
