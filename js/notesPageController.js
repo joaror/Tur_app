@@ -1,20 +1,13 @@
 function saveNote() {
     const noteForm = model.viewState;
     const notesVault = model.data.notes;
-    const isEdit = noteForm.noteViewPage.isEditing; // Endre noteViewPage til noteViewState?
+    const isEdit = noteForm.noteViewPage.isEditing; 
 
     if (isEdit) {
         noteForm.editNotePage.updatedAt = getTimestamp();
         notesVault[findIndexById(notesVault, noteForm.noteViewPage.noteId)] = noteForm.editNotePage;
         openNote(noteForm.editNotePage.id);
-        noteForm.editNotePage = {
-            noteId: null,
-            title: "",
-            date: "",
-            description: "",
-            topics: [],
-            errorMessage: "",
-        };
+        noteForm.editNotePage = clearEditNote();
     } else {
         const newNote = {
             id: getNextId(notesVault),
@@ -26,13 +19,28 @@ function saveNote() {
         };
         notesVault.push(newNote);
         openNote(newNote.id);
-        noteForm.newNotePage = {
-            title: "",
-            date: "",
-            description: "",
-            topics: [],
-            errorMessage: "",
-        };
+        noteForm.newNotePage = clearNewNote()
+    }
+}
+
+function clearNewNote() {
+    return {
+        title: "",
+        date: "",
+        description: "",
+        topics: [],
+        errorMessage: "",
+    }
+}
+
+function clearEditNote() {
+    return {
+        noteId: null,
+        title: "",
+        date: "",
+        description: "",
+        topics: [],
+        errorMessage: "",
     }
 }
 
@@ -44,8 +52,8 @@ function toggleMenu() {
 
 function duplicateNote() {
     const notesVault = model.data.notes
-    const selectedNote = structuredClone(findObjectById(notesVault, model.viewState.noteViewPage.noteId));
     const noteViewPage = model.viewState.noteViewPage
+    const selectedNote = structuredClone(findObjectById(notesVault, noteViewPage.noteId));
     
     const newNote = {
         id: getNextId(notesVault),
@@ -95,9 +103,9 @@ function deleteDialog() {
 }
 
 function editNote() {
-    const notesVault = structuredClone(model.data.notes);
+    const notesVault = model.data.notes;
     const selectedNote = model.viewState;
-    selectedNote.editNotePage = notesVault[findIndexById(notesVault, selectedNote.noteViewPage.noteId)];
+    selectedNote.editNotePage = structuredClone(notesVault[findIndexById(notesVault, selectedNote.noteViewPage.noteId)]);
 
     selectedNote.noteViewPage.isEditing = true;
     model.app.currentPage == "editNotePage" ? updateViewEditNotesPage() : goToPage("editNotePage");
@@ -123,27 +131,14 @@ function resetNoteActions() {
 
 function cancelNote() {
     const data = model.viewState;
+    const dataView = data.noteViewPage
 
-    if (data.noteViewPage.isDeleteDialogOpen) {
-        data.noteViewPage.isDeleteDialogOpen = false;
-        data.noteViewPage.isMenuOpen = false;
+    if (dataView.isDeleteDialogOpen) {
+        dataView.isDeleteDialogOpen = false;
+        dataView.isMenuOpen = false;
     }
     
-    data.editNotePage = {
-        noteId: null,
-        title: "",
-        date: "",
-        description: "",
-        topics: [],
-        errorMessage: "",
-    };
-
-    data.newNotePage = {
-        title: "",
-        date: "",
-        description: "",
-        topics: [],
-        errorMessage: "",
-    };
-    data.noteViewPage.noteId == null ? updateViewNotesPage() : updateViewNoteViewPage();
+    data.editNotePage = clearEditNote()
+    data.newNotePage = clearNewNote()
+    dataView.noteId == null ? updateViewNotesPage() : updateViewNoteViewPage();
 }
