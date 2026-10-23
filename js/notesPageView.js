@@ -18,14 +18,13 @@ function updateViewNotesPage() {
 }
 
 function updateViewEditNotesPage() {
-    const selectedForm  = model.viewState.noteViewPage.isEditing ? model.viewState.editNotePage : model.viewState.newNotePage;
     const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
                 ${createStatusBarHtml()}
                 
                 <header class="app-header app-header--actions">
-                    ${createBackButtonHtml("notesPage")}
+                    ${createBackButtonHtml("notesPage", "cancelSaveNote()")}
                     <h1>Nytt notat</h1>
                 </header>
 
@@ -48,7 +47,7 @@ function updateViewEditNotesPage() {
                             <label for="notat">Notat</label>
                             <div class="textarea-wrap">
                                 <textarea id="notat" 
-                                    oninput="selectedNote() = this.value"
+                                    oninput="selectedNote().description = this.value"
                                     placeholder="Skriv dine tanker, refleksjoner eller planer her...">${selectedNote().description ? selectedNote().description : ''}</textarea>
                                 <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
                                     <svg viewBox="0 0 24 24"
@@ -77,13 +76,12 @@ function updateViewEditNotesPage() {
                 </main>
                 
                 <div class="action-bar">
-                    <button class="btn btn-secondary" onclick="goToPage('notesPage')">Avbryt</button>
+                    <button class="btn btn-secondary" onclick="cancelSaveNote()">Avbryt</button>
                     <button class="btn btn-primary" onclick="saveNote()">Lagre</button>
                 </div>
                 
             </div>
         </div>
-
     `;
     document.getElementById("app").innerHTML = html;
 }
@@ -260,10 +258,11 @@ function getTags(tags, styleTag, modelObject) {
 
 function getNotes() {
     const data = model.data;
+    const notes = model.data.notes;
     let html = "";
     resetNoteActions()
 
-    for (let note of data.notes) {
+    for (let note of notes) {
         html += /* HTML */ `
             <div class="note-card" onclick="openNote(${note.id})">
                 <div class="note-card-header">
@@ -272,7 +271,7 @@ function getNotes() {
                 <h2>${note.title}</h2>
                 <p>${note.description}</p>
                 <div class="tags">
-                    ${getTags(findObjectById(data.notes, note.id).topics, "tag", data.topics)}
+                    ${getTags(note.topics, "tag", data.topics)}
                 </div>
             </div>
         `;

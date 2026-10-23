@@ -4,7 +4,7 @@ function saveNote() {
     const isEdit = noteForm.noteViewPage.isEditing; // Endre noteViewPage til noteViewState?
 
     if (isEdit) {
-        noteForm.editNotePage.updatedAt = getTimestamp()
+        noteForm.editNotePage.updatedAt = getTimestamp();
         notesVault[findIndexById(notesVault, noteForm.noteViewPage.noteId)] = noteForm.editNotePage;
         openNote(noteForm.editNotePage.id);
         noteForm.editNotePage = {
@@ -31,6 +31,7 @@ function saveNote() {
             date: "",
             description: "",
             topics: [],
+            errorMessage: "",
         };
     }
 }
@@ -59,7 +60,7 @@ function toggleTopic(topicId) {
 }
 
 function editNote() {
-    const notesVault = model.data.notes;
+    const notesVault = structuredClone(model.data.notes);
     const selectedNote = model.viewState.noteViewPage;
     model.viewState.editNotePage = notesVault[findIndexById(notesVault, selectedNote.noteId)];
 
@@ -80,4 +81,26 @@ function resetNoteActions() {
     const note = model.viewState.noteViewPage;
     note.noteId = null;
     note.isEditing = false;
+}
+
+function cancelSaveNote() {
+    const data = model.viewState;
+
+    data.editNotePage = {
+        noteId: null,
+        title: "",
+        date: "",
+        description: "",
+        topics: [],
+        errorMessage: "",
+    };
+
+    data.newNotePage = {
+        title: "",
+        date: "",
+        description: "",
+        topics: [],
+        errorMessage: "",
+    };
+    goToPage(data.noteViewPage.noteId == null ? "notesPage" : "noteViewPage");
 }
