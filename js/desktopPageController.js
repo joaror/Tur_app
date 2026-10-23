@@ -26,6 +26,8 @@
      desktopRemovePictureFromTripForm(pictureId, pageName) // fjerner et bilde
 
      desktopOpenNote(noteId)               // åpner et notat
+     desktopStartNewNote()                 // starter et nytt notat-skjema
+     desktopEditNote(noteId)               // åpner et eksisterende notat-skjema
      desktopSaveNewNote()                  // lagrer et nytt notat
      desktopSaveEditedNote()               // lagrer endringer på et notat
      desktopCancelNoteForm(pageName)       // avbryter et notat-skjema
@@ -48,7 +50,10 @@
      desktopRemoveCounty(id)               // sletter et fylke
 
      desktopIsTripFormValid(form)          // sjekker om skjemaet er gyldig
-     desktopClearTripForm(form)            // tømmer et skjema
+     desktopIsNoteFormValid(form)          // sjekker om skjemaet er gyldig
+     desktopClearTripForm(form)            // tømmer et tur-skjema
+     desktopClearNoteForm(form)            // tømmer et notat-skjema
+     desktopGetTodayAsDateText()           // dagens dato som tekst
      desktopAddPictureToForm(form)         // legger til et bilde i skjemaet
      desktopRemovePictureFromForm(form, pictureId) // fjerner et bilde fra skjemaet
      desktopLinkPicturesToTrip(pictureIds, tripId)  // knytter bildene til turen
@@ -87,8 +92,9 @@ function desktopHandleLogin() {
   login.passwordInput = "";
   login.isPasswordVisible = false;
 
-  /* På desktop starter vi på tursiden. */
-  model.app.currentPage = "tripsPage";
+  /* På desktop starter vi på forsiden, som viser de siste og de
+     planlagte turene. */
+  model.app.currentPage = "homePage";
   updateView();
 
   return false;
@@ -372,6 +378,18 @@ function desktopOpenNote(noteId) {
   updateView();
 }
 
+/* Starter et nytt notat-skjema. Vi tømmer et gammelt utkast og setter
+   dagens dato, slik at brukeren slipper å skrive datoen selv. */
+function desktopStartNewNote() {
+  const form = model.viewState.newNotePage;
+
+  desktopClearNoteForm(form);
+  form.date = desktopGetTodayAsDateText();
+
+  model.app.currentPage = "newNotePage";
+  updateView();
+}
+
 function desktopSaveNewNote() {
   const form = model.viewState.newNotePage;
 
@@ -393,14 +411,8 @@ function desktopSaveNewNote() {
 
   model.data.notes.push(newNote);
 
-  /* Vi lager et nytt view state, så at det ikke blir liggende igjen. */
-  model.viewState.newNotePage = {
-    title: "",
-    date: "",
-    description: "",
-    topics: [],
-    errorMessage: "",
-  };
+  /* Vi tømmer skjemaet, så det ikke ligger igjen som et utkast. */
+  desktopClearNoteForm(model.viewState.newNotePage);
 
   model.viewState.noteViewPage.noteId = newNote.id;
   model.viewState.noteViewPage.isMenuOpen = false;
@@ -580,16 +592,13 @@ function desktopRunSearch() {
   updateView();
 }
 
-/* Endrer et filter i søket. Aktivitet og emneknagg er id-er, sesong er
-   navnet på sesongen. */
+/* Endrer et filter i søket. Alle filtrene er ID-er, så vi gjør om
+   verdien fra skjemaet til et tall. En tom verdi betyr at vi ikke
+   filtrerer på det feltet. */
 function desktopSetSearchFilter(fieldName, value) {
   const search = model.viewState.searchPage;
 
-  if (fieldName === "season") {
-    search.season = value ? value : null;
-  } else {
-    search[fieldName] = value ? Number(value) : null;
-  }
+  search[fieldName] = value ? Number(value) : null;
 
   desktopRunSearch();
 }
@@ -785,6 +794,20 @@ function desktopClearNoteForm(form) {
   form.description = "";
   form.topics = [];
   form.errorMessage = "";
+}
+
+/* Dagens dato som tekst, på formatet 2026-10-23. Vi bruker datoen på
+   maskinen, ikke UTC, slik at det blir riktig dato også sent på døgnet. */
+function desktopGetTodayAsDateText() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+
+  const monthText = month < 10 ? "0" + month : "" + month;
+  const dayText = day < 10 ? "0" + day : "" + day;
+
+  return "" + year + "-" + monthText + "-" + dayText;
 }
 
 /* Legger til et bilde i skjemaet. Bildet ligger i model.data.images, men det

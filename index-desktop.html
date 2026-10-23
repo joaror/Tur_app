@@ -20,6 +20,8 @@
       function updateView() {
         if (model.app.currentPage === "loginPage") {
           updateViewDesktopLoginPage();
+        } else if (model.app.currentPage === "homePage") {
+          updateViewDesktopHomePage();
         } else if (model.app.currentPage === "tripsPage") {
           updateViewDesktopTripsPage();
         } else if (model.app.currentPage === "tripViewPage") {

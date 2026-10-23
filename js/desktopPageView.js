@@ -11,7 +11,9 @@
      desktopStartNewTrip()              – ny tur
      desktopOpenTrip(tripId)            – åpne en tur
      desktopEditTrip(tripId)            – redigere en tur
+     desktopStartNewNote()              – nytt notat
      desktopOpenNote(noteId)            – åpne et notat
+     desktopEditNote(noteId)            – redigere et notat
      desktopToggleTopic(topicId, page)  – slå en emneknagg av og på
      goToPage(page)                     – navigasjon i toppmenyen (common.js)
 
@@ -44,28 +46,50 @@
 
      createDesktopShellHtml(activeNav, contentHtml) // ramme med toppmeny og innhold
      createDesktopTopbarHtml(activeNav)              // toppmenyen
-     createDesktopTripCardHtml(trip)                 // et turkort
+     createDesktopIconHtml(pathData)                 // et lite ikon
+     createDesktopEyeIconHtml(isPasswordVisible)     // øyne-ikonet i innloggingen
+     createDesktopLoginErrorHtml(errorMessage)       // feilmeldingen i innloggingen
+     createDesktopEmptyHtml(text)                    // tommelding
+     createDesktopDialogHtml(title, text, confirmCall, cancelCall) // bekreftelsesdialog
+     createDesktopOptionsHtml(list, keyName, selectedId, emptyText) // dropdownene
      createDesktopTripGridHtml(trips, emptyText)     // ruten med turkort
+     createDesktopTripCardHtml(trip)                 // et turkort
+     createDesktopTripImagesHtml(trip)               // bildene under et turkort
+     createDesktopTripListHtml(trips, emptyText, newestFirst) // listen av turer
      createDesktopTripRowHtml(trip)                  // en rad i turlisten
-     createDesktopPlanItemHtml(trip)                 // en planlagt tur i høydekolonnen
      createDesktopTripMetaHtml(trip)                 // aktivitet, dato og sesong
+     createDesktopLocationHtml(trip)                 // sted og fylke
      createDesktopNotesTextHtml(description)         // teksten i en logg
-     createDesktopGalleryHtml(pictureIds, isForm)    // bildene på en tur
+     createDesktopGalleryHtml(pictureIds)            // bildene på en tur
+     createDesktopFormPicturesHtml(form, pageName)   // bildene i et tur-skjema
+     createDesktopPictureSvgHtml(pictureId)          // et bilde fra modellen
+     createDesktopPlanListHtml(trips)                // de planlagte turene
+     createDesktopPlanItemHtml(trip)                 // en planlagt tur
+     createDesktopTripMenuHtml(isMenuOpen)           // menyen på turvisningen
+     createDesktopTripDeleteDialogHtml(trip, isDeleteDialogOpen) // slettedialogen for turer
+     createDesktopNoteGridHtml(notes)                // ruten med notatkort
      createDesktopNoteCardHtml(note)                 // et notatkort
      createDesktopTopicTagsHtml(topicIds)            // emneknaggene til et notat
      createDesktopTopicChipsHtml(topicIds, pageName) // emneknaggene i et skjema
-     createDesktopOptionsHtml(list, keyName, selectedId, emptyText) // dropdownene
-     createDesktopDialogHtml(title, text, confirmCall, cancelCall) // bekreftelsesdialog
-     createDesktopEmptyHtml(text)                    // tommelding
+     createDesktopNoteMenuHtml(isMenuOpen)           // menyen på notatvisningen
+     createDesktopNoteDeleteDialogHtml(note, isDeleteDialogOpen) // slettedialogen for notater
+     createDesktopSearchResultHtml(results)          // treffene i søket
+     createDesktopSearchSeasonOptionsHtml(selectedSeasonId) // sesongene i søket
+     createDesktopSortOptionsHtml(selectedSortOrder) // sorteringen i søket
+     createDesktopSettingsSectionHtml(title, chipsHtml, fieldName, placeholder, addCall) // en seksjon i innstillingene
+     createDesktopChipListHtml(list, keyName, chipClass, removeCall) // chipene i innstillingene
 
+     desktopGetActiveNav()         // hvilken fane i toppmenyen som er aktiv
      desktopGetPlannedTrips()      // turer som ligger fram i tid
      desktopGetDoneTrips()         // turer som er gjennomført
      desktopIsDateTodayOrLater(date) // er datoen i dag eller senere
      desktopSortTripsByDate(trips, newestFirst) // sortering på dato
+     desktopSortItemsByDate(items, newestFirst) // sortering på dato
      desktopSortItemsByTitle(items, keyName)    // sortering på tittel
      desktopCountCounties()        // hvor mange fylker som er besøkt
      desktopGetSearchResults()     // turer og notater som passer søket
-     desktopGetActiveNav()         // hvilken fane i toppmenyen som er aktiv
+     desktopTripMatchesSearch(trip, text, search) // passer en tur søket
+     desktopNoteMatchesSearch(note, text, search) // passer et notat søket
    ========================================================================== */
 
 /* 1. Innlogging ============================================================ */
@@ -319,7 +343,7 @@ function updateViewDesktopTripViewPage() {
                     ${
                       trip.pictures.length === 0
                         ? createDesktopEmptyHtml("Ingen bilder på turen.")
-                        : createDesktopGalleryHtml(trip.pictures, false)
+                        : createDesktopGalleryHtml(trip.pictures)
                     }
                 </div>
             </section>
@@ -577,7 +601,8 @@ function updateViewDesktopNoteViewPage() {
 
 /* 6. Skjema for notater ==================================================== */
 
-/* Samme skjema brukes til nytt notat og til redigering. */
+/* Samme skjema brukes til nytt notat og til redigering. Datoen kommer fra
+   controlleren, som også tømmer skjemaet. Viewet bare leser verdiene. */
 function updateViewDesktopNewNotePage() {
   updateViewDesktopNoteForm("newNotePage", false);
 }
@@ -599,9 +624,6 @@ function updateViewDesktopNoteForm(pageName, isEdit) {
     ? "Endre notatet."
     : "Skriv ned en tanke, en plan eller en refleksjon.";
   const saveText = isEdit ? "Lagre endring" : "Lagre notat";
-
-  const today = new Date(); // Hent dagens dato
-  form.date = today.toISOString().split("T")[0]; // Formater som YYYY-MM-DD
 
   const html = createDesktopShellHtml(
     desktopGetActiveNav(),
@@ -903,12 +925,15 @@ function createDesktopShellHtml(activeNav, contentHtml) {
 function createDesktopTopbarHtml(activeNav) {
   return /*HTML*/ `
         <header class="topbar">
-            <a class="brand" href="#" onclick="goToPage('tripsPage');">
+            <a class="brand" href="#" onclick="goToPage('homePage');">
                 ${createDesktopIconHtml("M3 20l7-14 4 7 3-3 4 10z")}
                 Min friluft
             </a>
 
             <nav class="topnav">
+                <a class="${activeNav === "home" ? "active" : ""}" href="#" onclick="goToPage('homePage');">
+                    Hjem
+                </a>
                 <a class="${activeNav === "trips" ? "active" : ""}" href="#" onclick="goToPage('tripsPage');">
                     Turer
                 </a>
@@ -927,7 +952,7 @@ function createDesktopTopbarHtml(activeNav) {
                 <button class="btn btn-primary btn-new" type="button" onclick="desktopStartNewTrip();">
                     Ny tur
                 </button>
-                <button class="btn btn-primary btn-new" type="button" onclick="goToPage('newNotePage');">
+                <button class="btn btn-primary btn-new" type="button" onclick="desktopStartNewNote();">
                     Nytt notat
                 </button>                
             </div>
@@ -938,6 +963,10 @@ function createDesktopTopbarHtml(activeNav) {
 /* Hvilken fane i toppmenyen som er aktiv, ut fra hvilken side vi er på. */
 function desktopGetActiveNav() {
   const page = model.app.currentPage;
+
+  if (page === "homePage") {
+    return "home";
+  }
 
   if (
     page === "tripsPage" ||
@@ -1219,7 +1248,7 @@ function createDesktopNotesTextHtml(description) {
 }
 
 /* Bildene på en tur, i et rutenett. */
-function createDesktopGalleryHtml(pictureIds, isForm) {
+function createDesktopGalleryHtml(pictureIds) {
   let html = /*HTML*/ `<div class="gallery-grid">`;
 
   for (const pictureId of pictureIds) {
@@ -1467,18 +1496,24 @@ function createDesktopSearchResultHtml(results) {
   return html;
 }
 
-/* Sesongene i søkefiltrene. "Alle" betyr at vi ikke filtrerer på sesong. */
-function createDesktopSearchSeasonOptionsHtml(selectedSeason) {
+/* Sesongene i søkefiltrene. Filteret bruker sesongens ID, slik som
+   de andre filtrene. "Alle sesonger" betyr at vi ikke filtrerer. */
+function createDesktopSearchSeasonOptionsHtml(selectedSeasonId) {
   const seasons = model.data.seasons;
 
-  let html = /*HTML*/ `<option value="" ${selectedSeason ? "" : "selected"}>Alle sesonger</option>`;
+  /* Den tomme linja er valgt når vi ikke filtrerer på sesong. */
+  const emptySelected =
+    selectedSeasonId === null || selectedSeasonId === undefined ? "" : null;
+
+  let html = createOptionHtml("", "Alle sesonger", emptySelected);
 
   for (const season of seasons) {
+    /* "Alle" er ikke en sesong, men et filter. Den er alt håndtert over. */
     if (season.season === "Alle") {
       continue;
     }
 
-    html += createOptionHtml(season.season, season.season, selectedSeason);
+    html += createOptionHtml(season.id, season.season, selectedSeasonId);
   }
 
   return html;
@@ -1586,7 +1621,12 @@ function createDesktopEmptyHtml(text) {
 /* Dropdownene hentes fra modellen, slik at vi ikke skriver inn listen over
    aktiviteter og fylker to steder. */
 function createDesktopOptionsHtml(list, keyName, selectedId, emptyText) {
-  let html = createOptionHtml("", emptyText, "");
+  /* Den tomme linja skal være valgt når ingenting annet er valgt. Ellers
+     ville to linjer være merket som valgt samtidig. */
+  const emptySelected =
+    selectedId === null || selectedId === undefined ? "" : null;
+
+  let html = createOptionHtml("", emptyText, emptySelected);
 
   for (const item of list) {
     const value = item.id;
@@ -1765,7 +1805,7 @@ function desktopTripMatchesSearch(trip, text, search) {
     return false;
   }
 
-  if (search.season && getSeasonName(trip.date) !== search.season) {
+  if (search.season && getSeasonId(trip.date) !== search.season) {
     return false;
   }
 

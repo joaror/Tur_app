@@ -732,8 +732,11 @@ button {
   flex-shrink: 0;
 }
 
+/* Bildene under et turkort. flex-wrap gjør at bildene brytes til en ny
+   linje når de ikke får plass, slik at de aldri stikker ut av kortet. */
 .trip-card .trip-images {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 2px;
 }

@@ -185,28 +185,47 @@ function getNextId(array) {
 
 /* Sesongen regnes ut fra datoen, den lagres ikke på turen.
    Mars–mai er vår, juni–august er sommer, september–november er høst,
-   desember–februar er vinter. */
-function getSeasonName(dateText) {
+   desember–februar er vinter. Sesongene ligger i model.data.seasons,
+   der vår er 1, sommer er 2, høst er 3 og vinter er 4. */
+function getSeasonId(dateText) {
   if (!dateText) {
-    return "";
+    return null;
   }
 
   const date = new Date(dateText);
   const month = date.getMonth();
 
   if (month >= 2 && month <= 4) {
-    return "Vår";
+    return 1;
   }
 
   if (month >= 5 && month <= 7) {
-    return "Sommer";
+    return 2;
   }
 
   if (month >= 8 && month <= 10) {
-    return "Høst";
+    return 3;
   }
 
-  return "Vinter";
+  return 4;
+}
+
+/* Navnet på sesongen. Vi slår opp i model.data.seasons, så det finnes
+   bare ett sted som sier hva sesongene heter. */
+function getSeasonName(dateText) {
+  const seasonId = getSeasonId(dateText);
+
+  if (seasonId === null) {
+    return "";
+  }
+
+  const season = findObjectById(model.data.seasons, seasonId);
+
+  if (season) {
+    return season.season;
+  }
+
+  return "";
 }
 
 /* Tilbakeknappen i toppteksten. Den bruker goToPage() i controlleren.

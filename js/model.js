@@ -22,7 +22,6 @@ const model = {
       description: "",
       pictures: [],
       errorMessage: "",
-      updatedAt: "",
     },
 
     editTripPage: {
@@ -35,7 +34,6 @@ const model = {
       description: "",
       pictures: [],
       errorMessage: "",
-      updatedAt: "",
     },
 
     // Turliste
@@ -72,13 +70,14 @@ const model = {
       isDeleteDialogOpen: false,
     },
 
-    // Søk
+    // Søk. Filterne er ID-er, bortsett fra sesongen, som er sesongens
+    // ID i model.data.seasons. Treffene regnes ut når siden tegnes,
+    // og lagres derfor ikke her.
     searchPage: {
       searchStr: "",
       selectedActivity: null,
       selectedTopic: null,
       season: null,
-      searchHits: [],
       sortOrder: "dateDesc",
     },
 
