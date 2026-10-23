@@ -42,9 +42,25 @@ function toggleMenu() {
     updateViewNoteViewPage();
 }
 
-function openNote(id) {
-    model.viewState.noteViewPage.noteId = id;
-    goToPage("noteViewPage");
+function duplicateNote() {
+    const notesVault = model.data.notes
+    const selectedNote = structuredClone(findObjectById(notesVault, model.viewState.noteViewPage.noteId));
+    const noteViewPage = model.viewState.noteViewPage
+    
+    const newNote = {
+        id: getNextId(notesVault),
+        title: "Kopi av " + selectedNote.title,
+        date: selectedNote.date,
+        description: selectedNote.description,
+        topics: selectedNote.topics, 
+        updatedAt: getTimestamp(),
+    };
+    
+    model.data.notes.push(newNote);
+    noteViewPage.noteId = newNote.id
+    noteViewPage.isMenuOpen = false;
+    
+    updateViewNoteViewPage();
 }
 
 function toggleTopic(topicId) {
@@ -57,6 +73,11 @@ function toggleTopic(topicId) {
         note.push(topicId);
     }
     updateView();
+}
+
+function openNote(id) {
+    model.viewState.noteViewPage.noteId = id;
+    goToPage("noteViewPage");
 }
 
 function deleteNote() {
