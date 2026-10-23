@@ -297,19 +297,6 @@ function updateViewDesktopTripViewPage() {
         </div>
 
         <div class="detail-grid">
-            <section class="panel">
-                <div class="panel-head">
-                    <h2>Bilder</h2>
-                </div>
-                <div class="panel-body">
-                    ${
-                      trip.pictures.length === 0
-                        ? createDesktopEmptyHtml("Ingen bilder på turen.")
-                        : createDesktopGalleryHtml(trip.pictures, false)
-                    }
-                </div>
-            </section>
-
             <div class="side-column">
                 <section class="panel">
                     <div class="panel-head">
@@ -324,6 +311,18 @@ function updateViewDesktopTripViewPage() {
                     </div>
                 </section>
             </div>
+            <section class="panel">
+                <div class="panel-head">
+                    <h2>Bilder</h2>
+                </div>
+                <div class="panel-body">
+                    ${
+                      trip.pictures.length === 0
+                        ? createDesktopEmptyHtml("Ingen bilder på turen.")
+                        : createDesktopGalleryHtml(trip.pictures, false)
+                    }
+                </div>
+            </section>
         </div>
 
         ${createDesktopTripDeleteDialogHtml(trip, viewState.isDeleteDialogOpen)}
