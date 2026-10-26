@@ -34,20 +34,20 @@ function updateViewEditNotesPage() {
                             <label>Tittel</label>
                             <input type="text" 
                                 value="${selectedNote().title}"
-                                oninput="selectedNote().title = this.value" 
+                                oninput="selectedNote().title = escapeHtml(this.value)" 
                                 placeholder="f.eks. Sesongplanlegging vinter 2027" />
                         </div>
 
                         <div class="field">
                             <label>Dato</label>
-                            <input type="date" value="${selectedNote().date}" onchange="selectedNote().date = this.value"/>
+                            <input type="date" value="${selectedNote().date}" onchange="selectedNote().date = escapeHtml(this.value)"/>
                         </div>
                     
                         <div class="field">
                             <label for="notat">Notat</label>
                             <div class="textarea-wrap">
                                 <textarea id="notat" 
-                                    oninput="selectedNote().description = this.value"
+                                    oninput="selectedNote().description = escapeHtml(this.value)"
                                     placeholder="Skriv dine tanker, refleksjoner eller planer her...">${selectedNote().description ? selectedNote().description : ''}</textarea>
                                 <button type="button" class="mic-btn" id="micBtn" title="Snakk inn notat">
                                     <svg viewBox="0 0 24 24"
@@ -74,7 +74,7 @@ function updateViewEditNotesPage() {
                         </div>
                     </div>
                 </main>
-                
+                ${selectedNote().errorMessage ? /*HTML*/ `<p class="login-error">${selectedNote().errorMessage}</p>` : ""}
                 <div class="action-bar">
                     <button class="btn btn-secondary" onclick="cancelNote()">Avbryt</button>
                     <button class="btn btn-primary" onclick="saveNote()">Lagre</button>
@@ -99,10 +99,12 @@ function updateViewNoteViewPage() {
                     <div class="header-actions">
 
                         <button class="icon-btn" type="button" id="editBtn" onclick="editNote()" title="Rediger">
+
                             <svg viewBox="0 0 24 24"  fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                                 <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
+                            
                         </button>
                         
                         <div class="menu-wrap">

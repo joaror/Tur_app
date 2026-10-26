@@ -4,11 +4,19 @@ function saveNote() {
     const isEdit = noteForm.noteViewPage.isEditing; 
 
     if (isEdit) {
+        if (errorHandler(noteForm.editNotePage)) {
+            updateViewEditNotesPage();
+            return
+        } 
         noteForm.editNotePage.updatedAt = getTimestamp();
         notesVault[findIndexById(notesVault, noteForm.noteViewPage.noteId)] = noteForm.editNotePage;
         openNote(noteForm.editNotePage.id);
         noteForm.editNotePage = clearEditNote();
     } else {
+        if (errorHandler(noteForm.newNotePage)) {
+            updateViewEditNotesPage();
+            return
+        } 
         const newNote = {
             id: getNextId(notesVault),
             title: noteForm.newNotePage.title,
@@ -41,6 +49,18 @@ function clearEditNote() {
         description: "",
         topics: [],
         errorMessage: "",
+    }
+}
+
+function errorHandler(form) {
+    const title = form.title
+    const date = form.date
+
+    if (!date || !title) {
+        form.errorMessage = "Tittel og dato må være fyllt inn."
+        return true
+    } else {
+        form.errorMessage = ""
     }
 }
 
@@ -131,7 +151,7 @@ function resetNoteActions() {
 
 function cancelNote() {
     const data = model.viewState;
-    const dataView = data.noteViewPage
+    const dataView = model.viewState.noteViewPage
 
     if (dataView.isDeleteDialogOpen) {
         dataView.isDeleteDialogOpen = false;
@@ -140,5 +160,5 @@ function cancelNote() {
     
     data.editNotePage = clearEditNote()
     data.newNotePage = clearNewNote()
-    dataView.noteId == null ? updateViewNotesPage() : updateViewNoteViewPage();
+    dataView.noteId == null ? goToPage("notesPage") : updateViewNoteViewPage();
 }
