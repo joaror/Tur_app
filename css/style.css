@@ -100,10 +100,52 @@ body {
   align-items: center;
 }
 
-.status-icons svg {
-  width: 16px;
-  height: 16px;
+/* SVG-ikoner */
+.svg-display {
+    display: inline-block;
+    background-color: currentColor;
 }
+
+.svg-size-16 {
+    width: 16px;
+    height: 16px;
+}
+
+.svg-size-18 {
+    width: 18px;
+    height: 18px;
+}
+
+.svg-size-20 {
+    width: 20px;
+    height: 20px;
+}
+
+.svg-size-24 {
+  width: 24px;
+  height: 24px;
+}
+.status-icons span {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.svg-wifi {
+    mask: url("../svg/wifi.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/wifi.svg") center / contain no-repeat;
+}
+
+.svg-5g {
+    mask: url("../svg/5g.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/5g.svg") center / contain no-repeat;
+}
+
+.svg-battery {
+    mask: url("../svg/battery.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/battery.svg") center / contain no-repeat;
+}
+
 
 /* Topptekst: standard er blokk-varianten (tittel + valgfri undertekst) */
 .app-header {
@@ -170,9 +212,15 @@ body {
   background: var(--bg);
 }
 
-.back-btn svg {
-  width: 20px;
-  height: 20px;
+.svg-back {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+
+    background-color: currentColor;
+
+    mask: url("../svg/back.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/back.svg") center / contain no-repeat;
 }
 
 .header-actions {
@@ -201,6 +249,26 @@ body {
   width: 20px;
   height: 20px;
   color: var(--fg);
+}
+
+.svg-edit {
+    mask: url("../svg/edit.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/edit.svg") center / contain no-repeat;
+}
+
+.svg-dots {
+    mask: url("../svg/dots.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/dots.svg") center / contain no-repeat;
+}
+
+.svg-duplicate {
+    mask: url("../svg/duplicate.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/duplicate.svg") center / contain no-repeat;
+}
+
+.svg-trash {
+    mask: url("../svg/trash.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/trash.svg") center / contain no-repeat;
 }
 
 /* Rullbart innhold */
@@ -257,11 +325,6 @@ body {
   color: var(--accent);
 }
 
-.nav-item svg {
-  width: 24px;
-  height: 24px;
-}
-
 .nav-item span {
   font-weight: 500;
 }
@@ -270,10 +333,31 @@ body {
   outline-offset: -4px;
 }
 
+.svg-home {
+  mask: url("../svg/home.svg") center / contain no-repeat;
+  -webkit-mask: url("../svg/home.svg") center / contain no-repeat;
+}
+
+.svg-notes {
+  
+  mask: url("../svg/notes.svg") center / contain no-repeat;
+  -webkit-mask: url("../svg/notes.svg") center / contain no-repeat;
+}
+
+.svg-search {
+  mask: url("../svg/search.svg") center / contain no-repeat;
+  -webkit-mask: url("../svg/search.svg") center / contain no-repeat;
+}
+
+.svg-settings {
+  mask: url("../svg/settings.svg") center / contain no-repeat;
+  -webkit-mask: url("../svg/settings.svg") center / contain no-repeat;
+}
+
 /* Flyteknapp */
-.floating-action {
+ .floating-action {
   position: absolute;
-  bottom: 88px;
+  bottom: 108px;
   right: 20px;
   width: 56px;
   height: 56px;
@@ -285,10 +369,13 @@ body {
   cursor: pointer;
 }
 
-.floating-action svg {
-  width: 28px;
-  height: 28px;
-  color: white;
+.svg-float{
+  width: 56px;
+  height: 56px;
+  background-color: white;
+
+  mask: url("../svg/float.svg") center / contain no-repeat;
+  -webkit-mask: url("../svg/float.svg") center / contain no-repeat;
 }
 
 /* 4. Felles komponenter ==================================================== */
@@ -1665,6 +1752,14 @@ a.note-card:hover {
   color: var(--muted);
   font-family: var(--font-mono);
   margin: 16px 0 0;
+}
+
+.svg-calendar {
+    width: 12px;
+    height: 12px;
+
+    mask: url("../svg/calendar.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/calendar.svg") center / contain no-repeat;
 }
 
 /* Redigeringsmodus */
