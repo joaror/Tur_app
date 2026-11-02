@@ -9,9 +9,12 @@ function handleValidationErrors (errors, viewPage) {
     if (errors) {
         viewPage.errorMessage = errors;
         return true; // validation failed
+    } else if (viewPage.errorMessage !== "") {
+        viewPage.errorMessage = "";
     }
-    viewPage.errorMessage = "";
     return false; // validation passed
+        
+
 };
 
 // Builds a new note object from form data

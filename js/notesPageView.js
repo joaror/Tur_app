@@ -39,7 +39,7 @@ function updateViewEditNotesPage() {
                             <label>Tittel</label>
                             <input type="text" 
                                 value="${theNote.title}"
-                                oninput="theNote.title = escapeHtml(this.value)" 
+                                oninput="selectedNote().title = escapeHtml(this.value)" 
                                 placeholder="f.eks. Sesongplanlegging vinter 2027" />
                         </div>
                         <div class="field">
