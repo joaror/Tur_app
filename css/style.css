@@ -339,7 +339,6 @@ body {
 }
 
 .svg-notes {
-  
   mask: url("../svg/notes.svg") center / contain no-repeat;
   -webkit-mask: url("../svg/notes.svg") center / contain no-repeat;
 }
@@ -435,6 +434,17 @@ body {
   width: 14px;
   height: 14px;
 }
+
+.svg-geotag {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background-color: currentcolor;
+
+    mask: url("../svg/geotag.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/geotag.svg") center / contain no-repeat;
+}
+
 
 .trip-images {
   display: flex;
@@ -754,6 +764,8 @@ body {
   flex-shrink: 0;
 }
 
+
+
 .search-box input {
   flex: 1;
   border: none;
@@ -803,6 +815,17 @@ body {
   color: #fff;
   flex-shrink: 0;
 }
+
+.svg-arrow {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: white;
+  
+    mask: url("../svg/arrow.svg") center / contain no-repeat;
+    -webkit-mask: url("../svg/arrow.svg") center / contain no-repeat;  
+}
+
 
 /* Kun for skjermlesere */
 .sr-only {

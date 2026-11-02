@@ -184,12 +184,7 @@ function getTags(tags, styleTag, modelObject) {
     } else {
         for (let tag of tags) {
             html += /* HTML */ `
-                <span
-                    class="${styleTag} ${isSelected.includes(tag.id) ? "selected" : ""}"
-                    onclick="toggleTopic(${tag.id})"
-                >
-                    ${tag.topic}
-                </span>
+                <span class="${styleTag} ${isSelected.includes(tag.id) ? "selected" : ""}" onclick="toggleTopic(${tag.id})"> ${tag.topic} </span>
             `;
         }
         return html;
@@ -202,17 +197,23 @@ function getNotes() {
     let html = "";
     resetNoteActions();
 
-    for (let note of notes) {
-        html += /* HTML */ `
-            <div class="note-card" onclick="openNote(${note.id})">
-                <div class="note-card-header">
-                    <span class="note-date">${formatDate(note.date)}</span>
-                </div>
-                <h2>${note.title}</h2>
-                <p>${note.description}</p>
-                <div class="tags">${getTags(note.topics, "tag", data.topics)}</div>
-            </div>
+    if (notes.length <= 0) {
+        html = /*HTML*/ `
+            <div class="empty-text">Ingen notater funnet.</div>
         `;
+    } else {
+        for (let note of notes) {
+            html += /*HTML*/ `
+                <div class="note-card" onclick="openNote(${note.id})">
+                    <div class="note-card-header">
+                        <span class="note-date">${formatDate(note.date)}</span>
+                    </div>
+                    <h2>${note.title}</h2>
+                    <p>${note.description}</p>
+                    <div class="tags">${getTags(note.topics, "tag", data.topics)}</div>
+                </div>
+            `;
+        }
     }
     return html;
 }

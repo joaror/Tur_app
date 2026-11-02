@@ -1,33 +1,74 @@
+// Validates that required fields (title and date) are filled
+function validateRequiredFields (form) {
+    if (!form.date || !form.title || form.title.trim() === "")
+        return "Tittel og dato må være fyllt inn.";
+};
+
+// Handles validation errors and updates the error message
+function handleValidationErrors (errors, viewPage) {
+    if (errors) {
+        viewPage.errorMessage = errors;
+        return true; // validation failed
+    }
+    viewPage.errorMessage = "";
+    return false; // validation passed
+};
+
+// Builds a new note object from form data
+function buildNewNote (newNoteForm, vault) {
+    return {
+        id: getNextId(vault),
+        title: newNoteForm.title.trim(),
+        date: newNoteForm.date,
+        description: newNoteForm.description || "",
+        topics: newNoteForm.topics || [],
+        updatedAt: getTimestamp()
+    }
+};
+
+// Updates an existing note in the vault
+function updateNoteInVault(vault, noteId, updatedNote) {
+    const index = findIndexById(vault, noteId);
+    if (index !== -1) {
+        vault[index] = { ...vault[index], ...updatedNote };
+    }
+};
+
 function saveNote() {
     const noteForm = model.viewState;
     const notesVault = model.data.notes;
-    const isEdit = noteForm.noteViewPage.isEditing; 
+    const isEdit = noteForm.noteViewPage.isEditing;
 
     if (isEdit) {
-        if (errorHandler(noteForm.editNotePage)) {
+        // Handle edit mode
+        const errors = validateRequiredFields(noteForm.editNotePage);
+        if (handleValidationErrors(errors, noteForm.editNotePage)) {
             updateViewEditNotesPage();
-            return
-        } 
-        noteForm.editNotePage.updatedAt = getTimestamp();
-        notesVault[findIndexById(notesVault, noteForm.noteViewPage.noteId)] = noteForm.editNotePage;
+            return;
+        }
+
+        // Update the existing note and redirect
+        const updatedNote = { ...noteForm.editNotePage, updatedAt: getTimestamp() };
+        updateNoteInVault(notesVault, noteForm.noteViewPage.noteId, updatedNote);
         openNote(noteForm.editNotePage.id);
+
+        // Reset edit form
         noteForm.editNotePage = clearEditNote();
     } else {
-        if (errorHandler(noteForm.newNotePage)) {
+        // Handle new note mode
+        const errors = validateRequiredFields(noteForm.newNotePage);
+        if (handleValidationErrors(errors, noteForm.newNotePage)) {
             updateViewEditNotesPage();
-            return
-        } 
-        const newNote = {
-            id: getNextId(notesVault),
-            title: noteForm.newNotePage.title,
-            date: noteForm.newNotePage.date,
-            description: noteForm.newNotePage.description,
-            topics: noteForm.newNotePage.topics,
-            updatedAt: getTimestamp(),
-        };
+            return;
+        }
+
+        // Build and save the new note
+        const newNote = buildNewNote(noteForm.newNotePage, notesVault);
         notesVault.push(newNote);
         openNote(newNote.id);
-        noteForm.newNotePage = clearNewNote()
+
+        // Reset form
+        noteForm.newNotePage = clearNewNote();
     }
 }
 
@@ -38,7 +79,7 @@ function clearNewNote() {
         description: "",
         topics: [],
         errorMessage: "",
-    }
+    };
 }
 
 function clearEditNote() {
@@ -49,19 +90,7 @@ function clearEditNote() {
         description: "",
         topics: [],
         errorMessage: "",
-    }
-}
-
-function errorHandler(form) {
-    const title = form.title
-    const date = form.date
-
-    if (!date || !title) {
-        form.errorMessage = "Tittel og dato må være fyllt inn."
-        return true
-    } else {
-        form.errorMessage = ""
-    }
+    };
 }
 
 function toggleMenu() {
@@ -71,23 +100,23 @@ function toggleMenu() {
 }
 
 function duplicateNote() {
-    const notesVault = model.data.notes
-    const noteViewPage = model.viewState.noteViewPage
+    const notesVault = model.data.notes;
+    const noteViewPage = model.viewState.noteViewPage;
     const selectedNote = structuredClone(findObjectById(notesVault, noteViewPage.noteId));
-    
+
     const newNote = {
         id: getNextId(notesVault),
         title: "Kopi av " + selectedNote.title,
         date: selectedNote.date,
         description: selectedNote.description,
-        topics: selectedNote.topics, 
+        topics: selectedNote.topics,
         updatedAt: getTimestamp(),
     };
-    
+
     model.data.notes.push(newNote);
-    noteViewPage.noteId = newNote.id
+    noteViewPage.noteId = newNote.id;
     noteViewPage.isMenuOpen = false;
-    
+
     updateViewNoteViewPage();
 }
 
@@ -109,10 +138,7 @@ function openNote(id) {
 }
 
 function deleteNote() {
-    model.data.notes.splice(
-        findIndexById(model.data.notes, model.viewState.noteViewPage.noteId),
-        1,
-    );
+    model.data.notes.splice(findIndexById(model.data.notes, model.viewState.noteViewPage.noteId), 1);
     resetNoteActions();
     goToPage("notesPage");
 }
@@ -122,14 +148,29 @@ function deleteDialog() {
     updateViewNoteViewPage();
 }
 
+// Opens an existing note in edit mode
 function editNote() {
-    const notesVault = model.data.notes;
-    const selectedNote = model.viewState;
-    selectedNote.editNotePage = structuredClone(notesVault[findIndexById(notesVault, selectedNote.noteViewPage.noteId)]);
+    const vault = model.data.notes;
+    const viewState = model.viewState;
+    
+    // Find and deep-clone the target note
+    const noteIndex = findIndexById(vault, viewState.noteViewPage.noteId);
+    if (noteIndex === -1) {
+        console.warn("No valid note selected for editing");
+        return;
+    }
+    
+    // Populate edit form and prepare state
+    viewState.editNotePage = structuredClone(vault[noteIndex]);
+    viewState.noteViewPage.isEditing = true;
 
-    selectedNote.noteViewPage.isEditing = true;
-    model.app.currentPage == "editNotePage" ? updateViewEditNotesPage() : goToPage("editNotePage");
-}
+    // Update UI if already on edit page, or navigate to it
+    if (model.app.currentPage === "editNotePage") {
+        updateViewEditNotesPage();
+    } else {
+        goToPage("editNotePage");
+    }
+};
 
 function selectedNote() {
     const selectedNote = model.viewState;
@@ -151,14 +192,14 @@ function resetNoteActions() {
 
 function cancelNote() {
     const data = model.viewState;
-    const dataView = model.viewState.noteViewPage
+    const dataView = model.viewState.noteViewPage;
 
     if (dataView.isDeleteDialogOpen) {
         dataView.isDeleteDialogOpen = false;
         dataView.isMenuOpen = false;
     }
-    
-    data.editNotePage = clearEditNote()
-    data.newNotePage = clearNewNote()
+
+    data.editNotePage = clearEditNote();
+    data.newNotePage = clearNewNote();
     dataView.noteId == null ? goToPage("notesPage") : updateViewNoteViewPage();
 }
