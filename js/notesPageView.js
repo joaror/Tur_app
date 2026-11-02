@@ -21,6 +21,8 @@ function updateViewNotesPage() {
 }
 
 function updateViewEditNotesPage() {
+    const state = model.viewState.noteViewPage
+    const theNote = selectedNote()
     const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
@@ -28,7 +30,7 @@ function updateViewEditNotesPage() {
                 
                 <header class="app-header app-header--actions">
                     ${createBackButtonHtml("notesPage", "cancelNote()")}
-                    <h1>Nytt notat</h1>
+                    <h1>${state.isEditing ? "Endre notat" : "Nytt notat"}</h1>
                 </header>
 
                 <main class="content">
@@ -36,20 +38,20 @@ function updateViewEditNotesPage() {
                         <div class="field">
                             <label>Tittel</label>
                             <input type="text" 
-                                value="${selectedNote().title}"
-                                oninput="selectedNote().title = escapeHtml(this.value)" 
+                                value="${theNote.title}"
+                                oninput="theNote.title = escapeHtml(this.value)" 
                                 placeholder="f.eks. Sesongplanlegging vinter 2027" />
                         </div>
                         <div class="field">
                             <label>Dato</label>
-                            <input type="date" value="${selectedNote().date}" onchange="selectedNote().date = escapeHtml(this.value)"/>
+                            <input type="date" value="${theNote.date}" onchange="selectedNote().date = escapeHtml(this.value)"/>
                         </div>
                         <div class="field">
                             <label for="notat">Notat</label>
                             <div class="textarea-wrap">
                                 <textarea id="notat" 
                                     oninput="selectedNote().description = escapeHtml(this.value)"
-                                    placeholder="Skriv dine tanker, refleksjoner eller planer her...">${selectedNote().description ? selectedNote().description : ""}</textarea>
+                                    placeholder="Skriv dine tanker, refleksjoner eller planer her...">${theNote.description ? theNote.description : ""}</textarea>
                             </div>
                         </div>
                         <div class="tags-field">
@@ -60,7 +62,7 @@ function updateViewEditNotesPage() {
                         </div>
                     </div>
                 </main>
-                ${selectedNote().errorMessage ? /*HTML*/ `<p class="login-error">${selectedNote().errorMessage}</p>` : ""}
+                ${theNote.errorMessage ? /*HTML*/ `<p class="login-error">${theNote.errorMessage}</p>` : ""}
                 <div class="action-bar">
                     <button class="btn btn-secondary" onclick="cancelNote()">Avbryt</button>
                     <button class="btn btn-primary" onclick="saveNote()">Lagre</button>
@@ -72,7 +74,9 @@ function updateViewEditNotesPage() {
 }
 
 function updateViewNoteViewPage() {
-    const note = findObjectById(model.data.notes, model.viewState.noteViewPage.noteId);
+    const noteView = model.viewState.noteViewPage
+    const data = model.data
+    const note = findObjectById(data.notes, noteView.noteId);
     const html = /*HTML*/ `
         <div class="page-notes" style="display: flex; justify-content: center;">
             <div class="phone-frame">
@@ -95,7 +99,7 @@ function updateViewNoteViewPage() {
                                     svg-size-20">
                                 </span>
                             </button>
-                            <div class="menu" id="moreMenu" ${model.viewState.noteViewPage.isMenuOpen ? "" : "hidden"}>
+                            <div class="menu" id="moreMenu" ${noteView.isMenuOpen ? "" : "hidden"}>
                                 <button class="menu-item" type="button" onclick="duplicateNote()">
                                     <span class="svg-duplicate 
                                         svg-display 
@@ -129,12 +133,12 @@ function updateViewNoteViewPage() {
                     <div class="detail-section">
                         <p class="note-detail-text" id="viewText">${note.description} </P>
                         <div class="note-detail-tags" id="viewTags">
-                            ${getTags(note.topics, "tag", model.data.topics)}
+                            ${getTags(note.topics, "tag", data.topics)}
                         </div>
                         <p class="note-updated">Sist oppdatert: ${formatDate(note.updatedAt)}</p>
                     </div>
                 </div>
-                ${createNoteDeleteDialogHtml(note, model.viewState.noteViewPage.isDeleteDialogOpen)}
+                ${createNoteDeleteDialogHtml(note, noteView.isDeleteDialogOpen)}
                 ${createBottomNavHtml("notesPage")}
             </div>
         </div>
